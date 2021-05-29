@@ -1,10 +1,21 @@
 require('dotenv').config(); // позволяет использовать файл переменных окружения
-const express = require('express'); //импорт модуля
+const express = require('express'); //импорт фрейммворка
 const sequelize = require('./db'); // импорт конфигурации БД
+const models = require('./models/models'); // импорт созданных моделей (ORM)
+const cors = require('cors'); // импорт функции cors из пакета cors
+const router = require('./routes'); // импорт основного роутера
+const errorHandler = require('./middleware/ErrorHandlerMiddleware'); // мидлваре который работает с ошибками
 
 const PORT = process.env.PORT || 8080;
 
 const app = express();
+app.use(cors()); // настройка cors для возможности отправлять запросы с браузера
+app.use(express.json()) // чтобы приложение могло парсить json
+app.use('/api', router);
+
+// обработка ошибок, последний Middleware
+app.use(errorHandler); // мидл кот. работает с ошибками должен регистрироваться в самом конце
+
 
 // описание функции для подключения к базе данных
 const start = async () => {
