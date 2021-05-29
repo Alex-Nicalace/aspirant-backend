@@ -4,7 +4,7 @@ const faceNameController = require('../controllers/faceNameController');
 
 router.post('/', faceNameController.create);
 router.get('/:id', faceNameController.getOne);
-router.get('/', faceNameController.getAllNamesOneFace);
+router.get('/faceId/:faceId', faceNameController.getAllNamesOneFace);
 router.put('/', faceNameController.update);
 router.delete('/:id', faceNameController.delete);
 

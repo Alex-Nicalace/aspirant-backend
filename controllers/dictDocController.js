@@ -18,7 +18,7 @@ class dictDocController {
         return res.json(rec);
     }
 
-    async get(req, res) {
+    async getOne(req, res) {
         const {id} = req.params;
         const rec = await tblDictDoc.findByPk(id);
         return res.json(rec);

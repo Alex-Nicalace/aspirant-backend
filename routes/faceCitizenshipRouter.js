@@ -3,9 +3,9 @@ const router = new Router() // создаю объект этого роутер
 const faceCitizenshipController = require('../controllers/faceCitizenshipController');
 
 router.post('/', faceCitizenshipController.create);
-router.get('/:id', faceCitizenshipController.get);
+router.get('/:id', faceCitizenshipController.getOne);
 //router.get('/', faceCitizenshipController.getAll);
-router.get('/', faceCitizenshipController.getAllOneFace);
+router.get('/faceId/:faceId', faceCitizenshipController.getAllOneFace);
 router.delete('/:id', faceCitizenshipController.delete);
 router.put('/', faceCitizenshipController.update);
 

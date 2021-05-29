@@ -4,7 +4,7 @@ const dictDocController = require('../controllers/dictDocController');
 
 router.post('/',dictDocController.create);
 router.get('/', dictDocController.getAll);
-router.get('/:id', dictDocController.get);
+router.get('/:id', dictDocController.getOne);
 router.delete('/:id', dictDocController.delete);
 router.put('/', dictDocController.update);
 

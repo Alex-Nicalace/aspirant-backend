@@ -46,7 +46,7 @@ class faceNameController {
     }
 
     async getAllNamesOneFace(req, res) {
-        const {faceId} = req.query;
+        const {faceId} = req.params /*req.query*/;
         const recordset = await tblFaceName.findAll({
             where: {
                 tblFaceId: faceId

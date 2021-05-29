@@ -22,7 +22,7 @@ class faceCitizenshipController {
         return res.json(rec);
     }
 
-    async get(req, res) {
+    async getOne(req, res) {
         const {id} = req.params;
         const rec = await tblFaceCitizenship.findByPk(id);
         return res.json(rec);
@@ -30,7 +30,7 @@ class faceCitizenshipController {
     }
 
     async getAllOneFace(req, res) {
-        const {faceId} = req.query;
+        const {faceId} = req.params /*req.query*/;
         const recordset = await tblFaceCitizenship.findAll({
             where: {
                 tblFaceId: faceId
