@@ -1,48 +1,28 @@
 const {tblFaceName} = require('../models/models');
 const ApiError = require('../error/ApiError');
+const Crud = require('./Crud');
 
 // можно обойтись без класса создавая просто ф-ции, но
 // классы группируют
 class faceNameController {
-    async create(req, res) {
-        const {dateOn, lastname, firstname, middleName, tblFaceId} = req.body;
-        // т.к. это post запрос то у него body
-        const rec = await tblFaceName.create({dateOn, lastname, firstname, middleName, tblFaceId});
-        return res.json(rec);
+    async create(req, res, next) {
+        await Crud.create(req, res, next, tblFaceName);
     }
 
-    async update(req, res) {
-        const {id, dateOn, lastname, firstname, middleName, tblFaceId} = req.body; // деструктуризация тела запроса
-        const rec = await tblFaceName.findByPk(id); // нахожу запись по первичному ключу
-        if (!rec)
-            return res.json({message: 'record not found'});
-        rec.dateOn = dateOn;
-        rec.lastname = lastname;
-        rec.firstname = firstname;
-        rec.middleName = middleName;
-        rec.tblFaceId = tblFaceId;
-        await rec.save();
-        return res.json(rec);
+    async update(req, res, next) {
+        await Crud.update(req, res, next, tblFaceName);
     }
 
-    async getOne(req, res) {
-        const {id} = req.params;
-        const rec = await tblFaceName.findByPk(id);
-        return res.json(rec);
-
+    async getOne(req, res, next) {
+        await Crud.getOne(req, res, next, tblFaceName)
     }
 
-    async getAll(req, res) {
-        const recordset = await tblFaceName.findAll();
-        return res.json(recordset);
+    async getAll(req, res, next) {
+        await Crud.getOne(req, res, next, tblFaceName)
     }
 
-    async delete(req, res) {
-        const {id} = req.params;
-        const rec = await tblFaceName.findByPk(id);
-        //await tblDictCountry.destroy(rec);
-        await rec.destroy();
-        res.json({message: 'record deleted'})
+    async delete(req, res, next) {
+        await Crud.delete(req, res, next, tblFaceName)
     }
 
     async getAllNamesOneFace(req, res) {

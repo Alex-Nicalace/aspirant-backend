@@ -4,7 +4,7 @@ const dictCountryController = require('../controllers/dictCountryController'); /
 
 router.post('/', dictCountryController.create);
 router.get('/', dictCountryController.getAll);
-router.get('/:id', dictCountryController.get);
+router.get('/:id', dictCountryController.getOne);
 router.delete('/:id', dictCountryController.delete);
 router.put('/', dictCountryController.update);
 

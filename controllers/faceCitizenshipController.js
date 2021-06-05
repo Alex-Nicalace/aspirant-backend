@@ -2,30 +2,21 @@ const {tblFaceCitizenship} = require('../models/models');
 const ApiError = require('../error/ApiError');
 const {tblDictCountry} = require("../models/models");
 const {Sequelize} = require("sequelize");
+const  Crud  = require('./Crud');
 
 // можно обойтись без класса создавая просто ф-ции, но
 // классы группируют
 class faceCitizenshipController {
-    async create(req, res) {
-        const {tblFaceId, tblDictCountryId} = req.body;
-        // т.к. это post запрос то у него body
-        const rec = await tblFaceCitizenship.create({tblFaceId, tblDictCountryId});
-        return res.json(rec);
+    async create(req, res, next) {
+        await Crud.create(req, res, next, tblFaceCitizenship);
     }
 
-    async update(req, res) {
-        const {id, tblFaceId, tblDictCountryId} = req.body; // деструктуризация тела запроса
-        const rec = await tblFaceCitizenship.findByPk(id); // нахожу запись по первичному ключу
-        rec.tblFaceId = tblFaceId;
-        rec.tblDictCountryId = tblDictCountryId;
-        await rec.save();
-        return res.json(rec);
+    async update(req, res, next) {
+        await Crud.update(req, res, next, tblFaceCitizenship)
     }
 
-    async getOne(req, res) {
-        const {id} = req.params;
-        const rec = await tblFaceCitizenship.findByPk(id);
-        return res.json(rec);
+    async getOne(req, res, next) {
+        await Crud.getOne(req, res, next, tblFaceCitizenship)
 
     }
 
@@ -53,17 +44,12 @@ class faceCitizenshipController {
 
     }
 
-    async getAll(req, res) {
-        const recordset = await tblFaceCitizenship.findAll();
-        return res.json(recordset);
+    async getAll(req, res, next) {
+        await Crud.getAll(req, res, next, tblFaceCitizenship)
     }
 
-    async delete(req, res) {
-        const {id} = req.params;
-        const rec = await tblFaceCitizenship.findByPk(id);
-        //await tblDictCountry.destroy(rec);
-        await rec.destroy();
-        res.json({message: 'record deleted'})
+    async delete(req, res, next) {
+       await Crud.delete(req, res, next, tblFaceCitizenship)
     }
 }
 

@@ -1,16 +1,20 @@
 require('dotenv').config(); // позволяет использовать файл переменных окружения
 const express = require('express'); //импорт фрейммворка
 const sequelize = require('./db'); // импорт конфигурации БД
-const models = require('./models/models'); // импорт созданных моделей (ORM)
+//const models = require('./models/models'); // импорт созданных моделей (ORM)
 const cors = require('cors'); // импорт функции cors из пакета cors
+const fileUpload = require('express-fileupload'); //для работы с файлами
 const router = require('./routes'); // импорт основного роутера
 const errorHandler = require('./middleware/ErrorHandlerMiddleware'); // мидлваре который работает с ошибками
+const path = require('path'); //  утилиты для работы с путями к файлам и каталогам
 
 const PORT = process.env.PORT || 8080;
-
+//необходимо указать серверу, что файлы из папки static необходмио раздавать как статику
 const app = express();
 app.use(cors()); // настройка cors для возможности отправлять запросы с браузера
 app.use(express.json()) // чтобы приложение могло парсить json
+app.use(express.static(path.resolve(__dirname, 'static'))); // чтобы из браузера был доступ к файлам
+app.use(fileUpload({})); //регистрация ф-ции для работы с файлами
 app.use('/api', router);
 
 // обработка ошибок, последний Middleware

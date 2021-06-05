@@ -3,31 +3,21 @@ const ApiError = require('../error/ApiError');
 const {Op} = require("sequelize");
 const {Sequelize} = require("sequelize");
 const {tblFaceName} = require("../models/models");
+const Crud = require('./Crud');
 
 // можно обойтись без класса создавая просто ф-ции, но
 // классы группируют
 class faceController {
-    async create(req, res) {
-        const {birthdate} = req.body;
-        // т.к. это post запрос то у него body
-        const rec = await tblFace.create({birthdate});
-        return res.json(rec);
+    async create(req, res, next) {
+        await Crud.create(req, res, next, tblFace)
     }
 
-    async update(req, res) {
-        const {id, birthdate} = req.body; // деструктуризация тела запроса
-        const rec = await tblFace.findByPk(id); // нахожу запись по первичному ключу
-        if (!rec)
-            return res.json({message: 'record not found'});
-        rec.birthdate = birthdate;
-        await rec.save();
-        return res.json(rec);
+    async update(req, res, next) {
+        await Crud.update(req, res, next, tblFace)
     }
 
-    async getOne(req, res) {
-        const {id} = req.params;
-        const rec = await tblFace.findByPk(id);
-        return res.json(rec);
+    async getOne(req, res, next) {
+        await Crud.getOne(req, res, next, tblFace)
 
     }
 
@@ -91,23 +81,10 @@ class faceController {
         return res.json(recordset);
     }
 
-    async delete(req, res) {
-        const {id} = req.params;
-        const rec = await tblFace.findByPk(id);
-        //await tblDictCountry.destroy(rec);
-        await rec.destroy();
-        res.json({message: 'record deleted'})
+    async delete(req, res, next) {
+        await Crud.delete(req, res, next, tblFace)
     }
 
-    // async getAllNamesOneFace(req, res) {
-    //     const {id} = req.params;
-    //     const recordset = await tblFace.findAll({
-    //         where: {
-    //             tblFaceId: id
-    //         }
-    //     });
-    //     return res.json(recordset);
-    // }
 }
 
 // на выходе новый объект, созданный из этого класса
