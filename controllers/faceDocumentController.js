@@ -21,30 +21,35 @@ class faceDocumentController {
 
     }
 
-    async getAllOneFace(req, res) {
+    async getAllOneFace(req, res, next) {
         const {faceId} = req.params;
-        const rec = await tblFaceDocument.findAll({
-            where: {
-                tblFaceId: faceId
-            },
-            attributes: [
-                'id', 'dateOn', 'dateOff', 'createdAt', 'updatedAt',
-                [Sequelize.col('tblDictCountry.country'), 'country'], // указание поля из связной таблицы
-                [Sequelize.col('tblDictDoc.document'), 'document'], // указание поля из связной таблицы
-            ],
-            include: [
-                {
-                    model: tblDictCountry,
-                    attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
+        try {
+            const rec = await tblFaceDocument.findAll({
+                where: {
+                    tblFaceId: faceId
                 },
-                {
-                    model: tblDictDoc,
-                    attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
-                }
-            ],
-            order: [['dateOn', 'ASC']],
-        });
-        return res.json(rec);
+                attributes: [
+                    'id', 'dateOn', 'dateOff', 'createdAt', 'updatedAt',
+                    [Sequelize.col('tblDictCountry.country'), 'country'], // указание поля из связной таблицы
+                    [Sequelize.col('tblDictDoc.document'), 'document'], // указание поля из связной таблицы
+                ],
+                include: [
+                    {
+                        model: tblDictCountry,
+                        attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
+                    },
+                    {
+                        model: tblDictDoc,
+                        attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
+                    }
+                ],
+                order: [['dateOn', 'ASC']],
+            });
+            return res.json(rec);
+        } catch (e) {
+            next(ApiError.badRequest(e.message))
+
+        }
 
     }
 

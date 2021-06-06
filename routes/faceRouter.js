@@ -5,7 +5,7 @@ const faceController = require('../controllers/faceController');
 // первый параметр URL по которому роутер будет отрабатывать
 // 2 параметр сам роутер
 
-router.post('/', faceController.create);
+router.post('/', faceController.createFaceWithName);
 router.get('/', faceController.getAll);
 router.get('/:id', faceController.getOne);
 router.delete('/:id', faceController.delete);

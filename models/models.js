@@ -13,7 +13,9 @@ const {DataTypes} = require('sequelize');
 // 1. модель лицо
 const tblFace = sequelize.define('tblFace', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    birthdate: {type: DataTypes.DATE},
+    birthdate: {type: DataTypes.DATE, allowNull: false, validate: {
+            notNull: {args: true, msg: 'поле "дата рождения" не может быть пустым'},  // не допусает значение NULL
+        }},
     sex: {
         type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true, validate: {
             notNull: {args: true, msg: 'поле "пол" не может быть пустым'},  // не допусает значение NULL
@@ -151,13 +153,18 @@ const tblDictEducationLevel = sequelize.define('tblDictEducationLevel', {
 const tblFaceWork = sequelize.define('tblFaceWork', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     //tblFaceId
+    dateOn: {type: DataTypes.DATE},
+    dateOff: {type: DataTypes.DATE},
     enterprise: {
         type: DataTypes.STRING, allowNull: false, validate: {
             notNull: {args: true, msg: 'поле "место работы" не может быть пустым'},  // не допусает значение NULL
             notEmpty: {args: true, msg: 'поле "место работы" содержит пустое значение'} // не дупускает пустых псоледовательностей
         },
     },
-    jobTitle: {type: DataTypes.STRING,},
+    jobTitle: {
+        type: DataTypes.STRING,
+        validate: {notEmpty: {args: true, msg: 'поле "должность" содержит пустое значение'}}
+    }, // не дупускает пустых псоледовательностей}},
     lenOfService: {type: DataTypes.STRING, defaultValue: '000000'},
 })
 
@@ -230,52 +237,52 @@ const tblDictContactType = sequelize.define('tblDictContactType', {
 // tblFaceName.belongsTo(tblFace)
 
 tblFace.hasMany(tblFaceName);
-tblFaceName.belongsTo(tblFace);
+tblFaceName.belongsTo(tblFace, {foreignKey: {allowNull: false}/*чтобы не допускать пустого ключа*/});
 
 tblFace.hasMany(tblFaceCitizenship);
-tblFaceCitizenship.belongsTo(tblFace);
+tblFaceCitizenship.belongsTo(tblFace, {foreignKey: {allowNull: false}});
 
 tblFace.hasMany(tblFaceDocument);
-tblFaceDocument.belongsTo(tblFace);
+tblFaceDocument.belongsTo(tblFace, {foreignKey: {allowNull: false}});
 
 tblFace.hasMany(tblFacePhoto);
-tblFacePhoto.belongsTo(tblFace);
+tblFacePhoto.belongsTo(tblFace, {foreignKey: {allowNull: false}});
 
 tblDictCountry.hasMany(tblFaceCitizenship);
-tblFaceCitizenship.belongsTo(tblDictCountry);
+tblFaceCitizenship.belongsTo(tblDictCountry, {foreignKey: {allowNull: false}});
 
 tblDictCountry.hasMany(tblFaceDocument);
-tblFaceDocument.belongsTo(tblDictCountry);
+tblFaceDocument.belongsTo(tblDictCountry, {foreignKey: {allowNull: false}});
 
 tblDictDoc.hasMany(tblFaceDocument);
-tblFaceDocument.belongsTo(tblDictDoc);
+tblFaceDocument.belongsTo(tblDictDoc, {foreignKey: {allowNull: false}});
 
 tblFace.hasMany(tblFaceEducation);
-tblFaceEducation.belongsTo(tblFace);
+tblFaceEducation.belongsTo(tblFace, {foreignKey: {allowNull: false}});
 
 tblDictEducationLevel.hasMany(tblFaceEducation);
-tblFaceEducation.belongsTo(tblDictEducationLevel);
+tblFaceEducation.belongsTo(tblDictEducationLevel, {foreignKey: {allowNull: false}});
 
 tblFace.hasMany(tblFaceWork);
-tblFaceWork.belongsTo(tblFace);
+tblFaceWork.belongsTo(tblFace, {foreignKey: {allowNull: false}});
 
 tblFace.hasMany(tblFaceResidence);
-tblFaceResidence.belongsTo(tblFace);
+tblFaceResidence.belongsTo(tblFace, {foreignKey: {allowNull: false}});
 
 tblDictCountry.hasMany(tblFaceResidence);
-tblFaceResidence.belongsTo(tblDictCountry);
+tblFaceResidence.belongsTo(tblDictCountry, {foreignKey: {allowNull: false}});
 
 tblDictCity.hasMany(tblFaceResidence);
-tblFaceResidence.belongsTo(tblDictCity);
+tblFaceResidence.belongsTo(tblDictCity, {foreignKey: {allowNull: false}});
 
 tblDictStreet.hasMany(tblFaceResidence);
-tblFaceResidence.belongsTo(tblDictStreet);
+tblFaceResidence.belongsTo(tblDictStreet, {foreignKey: {allowNull: false}});
 
 tblFace.hasMany(tblFaceContacts);
-tblFaceContacts.belongsTo(tblFace);
+tblFaceContacts.belongsTo(tblFace, {foreignKey: {allowNull: false}});
 
 tblDictContactType.hasMany(tblFaceContacts);
-tblFaceContacts.belongsTo(tblDictContactType);
+tblFaceContacts.belongsTo(tblDictContactType, {foreignKey: {allowNull: false}});
 
 // экспорт моделей, для возможности использования в других файлах
 module.exports = {
