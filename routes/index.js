@@ -18,6 +18,8 @@ const dictStreetRouter = require('./dictStreetRouter');
 const dictContactTypeRouter = require('./dictContactTypeRouter');
 const faceResidenceRouter = require('./faceResidenceRouter');
 const faceContactsRouter = require('./faceContactsRouter');
+const dictEnterpriseRouter = require('./dictEnterpriseRouter');
+const dictEnterpriseAsTreeRouter = require('./dictEnterpriseAsTreeRouter');
 
 // в основном роутере необходимо указать подроутеры
 // первый параметр URL по которому роутер будет отрабатывать
@@ -40,6 +42,8 @@ router.use('/dict-education-level', dictEducationLevelRouter);
 router.use('/dict-city', dictCityRouter );
 router.use('/dict-street', dictStreetRouter );
 router.use('/dict-contact-type', dictContactTypeRouter );
+router.use('/dict-enterprise', dictEnterpriseRouter );
+router.use('/dict-enterprise-as-tree', dictEnterpriseAsTreeRouter );
 
 
 module.exports = router;
