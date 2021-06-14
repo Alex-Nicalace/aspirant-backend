@@ -20,6 +20,8 @@ const faceResidenceRouter = require('./faceResidenceRouter');
 const faceContactsRouter = require('./faceContactsRouter');
 const dictEnterpriseRouter = require('./dictEnterpriseRouter');
 const dictEnterpriseAsTreeRouter = require('./dictEnterpriseAsTreeRouter');
+const orderRouter = require('./orderRouter');
+const faceOrderRouter = require('./faceOrderRouter');
 
 // в основном роутере необходимо указать подроутеры
 // первый параметр URL по которому роутер будет отрабатывать
@@ -35,6 +37,9 @@ router.use('/face-education', faceEducationRouter);
 router.use('/face-work', faceWorkRouter);
 router.use('/face-residence', faceResidenceRouter);
 router.use('/face-contact', faceContactsRouter);
+router.use('/face-order', faceOrderRouter);
+
+router.use('/order', orderRouter);
 
 router.use('/dict-doc', dictDocRouter);
 router.use('/dict-country', dictCountryRouter);

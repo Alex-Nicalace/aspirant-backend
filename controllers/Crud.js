@@ -32,7 +32,7 @@ class Crud {
         const {id} = req.params;
         try {
             const rec = await model.findByPk(id);
-            return res.json(rec);
+            return res.json(rec ?? []);
         } catch (e) {
             next(ApiError.badRequest(e.message))
         }

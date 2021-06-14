@@ -72,44 +72,48 @@ class faceController {
             return res.json(recordset);
         }*/
 
-    async getAll(req, res) {
+    async getAll(req, res, next) {
         const takeValuesFromField = (arr, nameField) => {
             return arr.map(i => {
                 return i[nameField]
             })
         }
 
-        const recordset = await tblFaceName.findAll({
-            attributes: [
-                'tblFaceId', //'lastName',
-                [Sequelize.fn('max', Sequelize.col('dateOn')), 'dateOn']
-            ],
-            group: 'tblFaceId',
-        })
-            .then(lastNames => {
-                return tblFaceName.findAll({
-                    attributes: [
-                        [Sequelize.col('tblFace.id'), 'id'],
-                        [Sequelize.col('tblFace.birthdate'), 'birthdate'],
-                        [Sequelize.col('tblFace.createdAt'), 'createdAt'],
-                        [Sequelize.col('tblFace.updatedAt'), 'updatedAt'],
-                        'lastname', 'firstname', 'middleName', 'dateOn'
-                    ],
-                    where: {
-                        [Op.and]: [
-                            {tblFaceId: {[Op.in]: takeValuesFromField(lastNames, 'tblFaceId')}},
-                            {dateOn: {[Op.in]: takeValuesFromField(lastNames, 'dateOn')}}],
-                    },
-                    include: [
-                        {
-                            model: tblFace,
-                            attributes: [],
-                            required: true, // преобразовывая запрос из значения OUTER JOINпо умолчанию в запрос INNER JOIN
-                        }
-                    ]
-                })
+        try {
+            const recordset = await tblFaceName.findAll({
+                attributes: [
+                    'tblFaceId', //'lastName',
+                    [Sequelize.fn('max', Sequelize.col('dateOn')), 'dateOn']
+                ],
+                group: 'tblFaceId',
             })
-        return res.json(recordset);
+                .then(lastNames => {
+                    return tblFaceName.findAll({
+                        attributes: [
+                            [Sequelize.col('tblFace.id'), 'id'],
+                            [Sequelize.col('tblFace.birthdate'), 'birthdate'],
+                            [Sequelize.col('tblFace.createdAt'), 'createdAt'],
+                            [Sequelize.col('tblFace.updatedAt'), 'updatedAt'],
+                            'lastname', 'firstname', 'middleName', 'dateOn'
+                        ],
+                        where: {
+                            [Op.and]: [
+                                {tblFaceId: {[Op.in]: takeValuesFromField(lastNames, 'tblFaceId')}},
+                                {dateOn: {[Op.in]: takeValuesFromField(lastNames, 'dateOn')}}],
+                        },
+                        include: [
+                            {
+                                model: tblFace,
+                                attributes: [],
+                                required: true, // преобразовывая запрос из значения OUTER JOINпо умолчанию в запрос INNER JOIN
+                            }
+                        ]
+                    })
+                })
+            return res.json(recordset);
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
     }
 
     async delete(req, res, next) {

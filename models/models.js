@@ -46,7 +46,7 @@ const tblFaceName = sequelize.define('tblFaceName', {
     middleName: {type: DataTypes.STRING},
 }, {
     indexes: [
-        {unique: false, fields:['tblFaceId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblFaceId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
     ]
 })
 
@@ -57,8 +57,8 @@ const tblFaceCitizenship = sequelize.define('tblFaceCitizenship', {
     // внешние связи sequelize подставит сам
 }, {
     indexes: [
-        {unique: false, fields:['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
-        {unique: false, fields:['tblDictCountryId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictCountryId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
     ]
 })
 
@@ -71,8 +71,8 @@ const tblFaceDocument = sequelize.define('tblFaceDocument', {
     dateOff: {type: DataTypes.DATEONLY},
 }, {
     indexes: [
-        {unique: false, fields:['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
-        {unique: false, fields:['tblDictCountryId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictCountryId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
     ]
 })
 
@@ -115,7 +115,7 @@ const tblFacePhoto = sequelize.define('tblFacePhoto', {
     pathFile: {type: DataTypes.STRING, allowNull: false, unique: true, validate: {unique: true}},
 }, {
     indexes: [
-        {unique: false, fields:['tblFaceId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblFaceId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
     ]
 })
 
@@ -139,8 +139,8 @@ const tblFaceEducation = sequelize.define('tblFaceEducation', {
     quantitySatisfactory: {type: DataTypes.INTEGER, allowNull: false, defaultValue: 0},
 }, {
     indexes: [
-        {unique: false, fields:['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
-        {unique: false, fields:['tblDictEducationLevelId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictEducationLevelId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
     ]
 })
 
@@ -193,7 +193,7 @@ const tblFaceWork = sequelize.define('tblFaceWork', {
     lenOfService: {type: DataTypes.STRING, defaultValue: '000000'},
 }, {
     indexes: [
-        {unique: false, fields:['tblFaceId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblFaceId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
     ]
 })
 
@@ -209,10 +209,10 @@ const tblFaceResidence = sequelize.define('tblFaceResidence', {
     apartment: {type: DataTypes.STRING,},
 }, {
     indexes: [
-        {unique: false, fields:['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
-        {unique: false, fields:['tblDictCountryId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
-        {unique: false, fields:['tblDictCityId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
-        {unique: false, fields:['tblDictStreetId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictCountryId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictCityId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictStreetId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
     ]
 })
 
@@ -254,8 +254,8 @@ const tblFaceContacts = sequelize.define('tblFaceContacts', {
     },
 }, {
     indexes: [
-        {unique: false, fields:['tblFaceId']},// индекс по внешнему ключу для оптимизатора запросов СУБД
-        {unique: false, fields:['tblDictContactTypeId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblFaceId']},// индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictContactTypeId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
     ]
 })
 
@@ -284,23 +284,200 @@ const tblDictEnterprise = sequelize.define('tblDictEnterprise', {
         },
     },
     note: {type: DataTypes.STRING(500)},
+    whatIsIt: {type: DataTypes.STRING} // faculty, department
 }, {
     freezeTableName: true, // по умолч. библ. делает название таблицы = название модели во множественном числе. Эта опция отключает это поведение
     indexes: [
-        {unique: false, fields:['parentId']} // индекс по полю
+        {unique: false, fields: ['parentId']} // индекс по полю
     ]
+})
+
+// 16. таблица, содержащая приказы
+const tblOrder = sequelize.define('tblOrder', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    numOrder: {
+        type: DataTypes.STRING, allowNull: false, validate: {
+            notNull: {args: true, msg: 'приказ нельзя указывать без номера'},  // не допусает значение NULL
+            notEmpty: {args: true, msg: 'номер приказа не может содержать пустую последовательность'} // не дупускает пустых псоледовательностей
+        }
+    },
+    dateOrder: {
+        type: DataTypes.DATEONLY, allowNull: false, validate: {
+            notNull: {args: true, msg: 'приказ нельзя указывать без даты'},  // не допусает значение NULL
+        }
+    },
+    text: {type: DataTypes.TEXT},
+
+})
+
+// 17. промежуточная таблица для формирорвания многий-ко-многим лица в приказах
+const tblFace_tblOrder = sequelize.define('tblFace_tblOrder', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    tblFaceId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: tblFace,
+            key: 'id'
+        }
+    },
+    tblOrderId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: tblOrder,
+            key: 'id'
+        }
+    },
+    note: {type: DataTypes.STRING}
+}, {
+    freezeTableName: true, // по умолч. библ. делает название таблицы = название модели во множественном числе. Эта опция отключает это поведение
+    indexes: [
+        {unique: false, fields: ['tblFaceId']}, // индекс по полю
+        {unique: false, fields: ['tblOrderId']} // индекс по полю
+    ]
+})
+
+// 18. справосник предметов обучения
+const tblDictSubject = sequelize.define('tblDictSubject', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    subject: {
+        type: DataTypes.STRING, allowNull: false, validate: {
+            notNull: {args: true, msg: 'не допускается пустое значение'},  // не допусает значение NULL
+            notEmpty: {args: true, msg: 'не допускается пустая последовательность'} // не дупускает пустых псоледовательностей
+        }
+    },
+})
+
+// 19 таблица, кот. содежит кандидатский минимум, либо вступительные экзамены
+const tblFaceEntranceExamin = sequelize.define('tblFaceEntranceExamin', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    //tblFaceId
+    //tblDictSubjectId
+    date: {
+        type: DataTypes.DATEONLY, allowNull: false, validate: {
+            notNull: {args: true, msg: 'поле ДАТА не допускается пустое значение'},  // не допусает значение NULL
+        }
+    },
+    estimate: {
+        type: DataTypes.INTEGER, allowNull: false, validate: {
+            notNull: {args: true, msg: 'поле ДАТА не допускается пустое значение'},  // не допусает значение NULL
+        }
+    },
+    isСandidateMin: {
+        type: DataTypes.BOOLEAN, allowNull: false, validate: {
+            notNull: {args: true, msg: 'поле ДАТА не допускается пустое значение'},  // не допусает значение NULL
+        }
+    }
+})
+
+// 20 таблица, содержащая аспирантов
+const tblFaceAspirant = sequelize.define('tblFaceAspirant', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    //tblFaceId
+    isRecommendation: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
+    isProtocol: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
+    isAgree: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
+    isHeadDepartment: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
+    //tblDictSubjectId
+    //tblDictEducationFormId
+    //tblDictSpecialty
+    dissertationTheme: {type: DataTypes.STRING(500)},
+    //tblAcademicAdvisorId
+})
+
+// 21 справочник форм образования
+const tblDictEducationForm = sequelize.define('tblDictEducationForm', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    educationForm: {
+        type: DataTypes.STRING, allowNull: false, validate: {
+            notNull: {args: true, msg: 'не допускается пустое значение'},  // не допусает значение NULL
+            notEmpty: {args: true, msg: 'не допускается пустая последовательность'} // не дупускает пустых псоледовательностей
+        }
+    }
+})
+
+// 22 таблица специальностей иерархия
+const tblDictSpecialty = sequelize.define('tblDictSpecialty', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    // parentId
+    name: {
+        type: DataTypes.STRING, allowNull: false, validate: {
+            notNull: {args: true, msg: 'не допускается пустое значение'},  // не допусает значение NULL
+            notEmpty: {args: true, msg: 'не допускается пустая последовательность'} // не дупускает пустых псоледовательностей
+        },
+    },
+    note: {type: DataTypes.STRING},
+    whatIsIt: {type: DataTypes.STRING, allowNull: false} // direction, orientation, specialty
+})
+
+// 23 таблица научных руководителей
+const tblAcademicAdvisor = sequelize.define('tblAcademicAdvisor', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    //tblFaceId
+})
+
+// 24 научные публикации
+const tblFaceScientificPublications = sequelize.define('tblFaceScientificPublications', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    //tblFaceId
+    date: {type: DataTypes.DATEONLY},
+    info: {type: DataTypes.TEXT},
+})
+
+// 25 справочник результатов аттестации
+const tblDictCertificationResult = sequelize.define('tblDictCertificationResult', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    result: {
+        type: DataTypes.STRING, allowNull: false, validate: {
+            notNull: {args: true, msg: 'не допускается пустое значение'},  // не допусает значение NULL
+            notEmpty: {args: true, msg: 'не допускается пустая последовательность'} // не дупускает пустых псоледовательностей
+        },
+    }
+})
+
+// 26 аттестация за каждый проученный год
+const tblFaceCertificationResult = sequelize.define('tblFaceCertificationResult', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    //tblFaceId,
+    year: {
+        type: DataTypes.INTEGER, allowNull: false, validate: {
+            notNull: {args: true, msg: 'не допускается пустое значение'},  // не допусает значение NULL
+        },
+    },
+    //tblDictCertificationResultId
+})
+
+// 27. сведения о командировках
+const tblFaceBusinessTrip = sequelize.define('tblFaceBusinessTrip', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    //tblFaceId,
+    date: {type: DataTypes.DATEONLY},
+    info: {type: DataTypes.TEXT},
+})
+
+// 28. оценки по предметам по семестрам
+const tblFaceExaminations = sequelize.define('tblFaceExaminations', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    //tblFaceId,
+    //tblDictSubjectId,
+    estimate: {type: DataTypes.STRING},
+    semesterNum: {type: DataTypes.INTEGER},
 })
 
 // теперь необходимо описать как модели свзяны друг с дугом
 
+// описание связи многий-ко-многим (лица в приказах)
+tblFace.belongsToMany(tblOrder, {through: tblFace_tblOrder /*табл. связующая*/});
+tblOrder.belongsToMany(tblFace, {through: tblFace_tblOrder});
+
+
 // описание древовидной модели
 tblDictEnterprise.hasMany(tblDictEnterprise, {
-    foreignKey:{field:'parentId', name:'parentId'},
-    onDelete:'CASCADE', // если удалять то вместе с зависимыми ветками
+    foreignKey: {field: 'parentId', name: 'parentId'},
+    onDelete: 'CASCADE', // если удалять то вместе с зависимыми ветками
     as: 'children'
 });
 tblDictEnterprise.belongsTo(tblDictEnterprise, {
-    foreignKey:{field:'parentId', name:'parentId'},
+    foreignKey: {field: 'parentId', name: 'parentId'},
     //as: 'children'
 });
 
@@ -369,7 +546,9 @@ module.exports = {
     tblDictStreet,
     tblFaceContacts,
     tblDictContactType,
-    tblDictEnterprise
+    tblDictEnterprise,
+    tblOrder,
+    tblFace_tblOrder,
 
 }
 

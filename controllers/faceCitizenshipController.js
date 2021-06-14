@@ -20,27 +20,31 @@ class faceCitizenshipController {
 
     }
 
-    async getAllOneFace(req, res) {
+    async getAllOneFace(req, res, next) {
         const {faceId} = req.params /*req.query*/;
-        const recordset = await tblFaceCitizenship.findAll({
-            where: {
-                tblFaceId: faceId
-            },
-            attributes: [ // указание какие поля необходимо вывести
-                'id','createdAt','updatedAt','tblFaceId','tblDictCountryId',
-                [Sequelize.col('tblDictCountry.country'), 'citizenship'] // указание поля из связной таблицы
-
-            ],
-            include: [
-                {
-                    model: tblDictCountry,
-                    attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
-                    //as: 'Citizenship'
-                    required: true // преобразовывая запрос из значения OUTER JOINпо умолчанию в запрос INNER JOIN
+        try {
+            const recordset = await tblFaceCitizenship.findAll({
+                where: {
+                    tblFaceId: faceId
                 },
-            ]
-        });
-        return res.json(recordset);
+                attributes: [ // указание какие поля необходимо вывести
+                    'id', 'createdAt', 'updatedAt', 'tblFaceId', 'tblDictCountryId',
+                    [Sequelize.col('tblDictCountry.country'), 'citizenship'] // указание поля из связной таблицы
+
+                ],
+                include: [
+                    {
+                        model: tblDictCountry,
+                        attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
+                        //as: 'Citizenship'
+                        required: true // преобразовывая запрос из значения OUTER JOINпо умолчанию в запрос INNER JOIN
+                    },
+                ]
+            });
+            return res.json(recordset);
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
 
     }
 

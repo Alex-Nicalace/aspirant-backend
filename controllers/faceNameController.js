@@ -18,7 +18,7 @@ class faceNameController {
     }
 
     async getAll(req, res, next) {
-        await Crud.getOne(req, res, next, tblFaceName)
+        await Crud.getAll(req, res, next, tblFaceName)
     }
 
     async delete(req, res, next) {
