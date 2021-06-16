@@ -367,6 +367,11 @@ const tblFaceEntranceExamin = sequelize.define('tblFaceEntranceExamin', {
             notNull: {args: true, msg: 'поле ДАТА не допускается пустое значение'},  // не допусает значение NULL
         }
     }
+}, {
+    indexes: [
+        {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictSubjectId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
+    ]
 })
 
 // 20 таблица, содержащая аспирантов
@@ -382,6 +387,14 @@ const tblFaceAspirant = sequelize.define('tblFaceAspirant', {
     //tblDictSpecialty
     dissertationTheme: {type: DataTypes.STRING(500)},
     //tblAcademicAdvisorId
+}, {
+    indexes: [
+        {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictSubjectId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictEducationFormId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictSpecialty']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblAcademicAdvisorId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+    ]
 })
 
 // 21 справочник форм образования
@@ -407,12 +420,20 @@ const tblDictSpecialty = sequelize.define('tblDictSpecialty', {
     },
     note: {type: DataTypes.STRING},
     whatIsIt: {type: DataTypes.STRING, allowNull: false} // direction, orientation, specialty
+}, {
+    indexes: [
+        {unique: false, fields: ['parentId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+    ]
 })
 
 // 23 таблица научных руководителей
 const tblAcademicAdvisor = sequelize.define('tblAcademicAdvisor', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     //tblFaceId
+}, {
+    indexes: [
+        {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+    ]
 })
 
 // 24 научные публикации
@@ -421,6 +442,10 @@ const tblFaceScientificPublications = sequelize.define('tblFaceScientificPublica
     //tblFaceId
     date: {type: DataTypes.DATEONLY},
     info: {type: DataTypes.TEXT},
+}, {
+    indexes: [
+        {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+    ]
 })
 
 // 25 справочник результатов аттестации
@@ -444,6 +469,11 @@ const tblFaceCertificationResult = sequelize.define('tblFaceCertificationResult'
         },
     },
     //tblDictCertificationResultId
+}, {
+    indexes: [
+        {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictCertificationResultId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+    ]
 })
 
 // 27. сведения о командировках
@@ -452,6 +482,10 @@ const tblFaceBusinessTrip = sequelize.define('tblFaceBusinessTrip', {
     //tblFaceId,
     date: {type: DataTypes.DATEONLY},
     info: {type: DataTypes.TEXT},
+}, {
+    indexes: [
+        {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+    ]
 })
 
 // 28. оценки по предметам по семестрам
@@ -461,6 +495,11 @@ const tblFaceExaminations = sequelize.define('tblFaceExaminations', {
     //tblDictSubjectId,
     estimate: {type: DataTypes.STRING},
     semesterNum: {type: DataTypes.INTEGER},
+}, {
+    indexes: [
+        {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictSubjectId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+    ]
 })
 
 // теперь необходимо описать как модели свзяны друг с дугом
@@ -529,6 +568,59 @@ tblFaceContacts.belongsTo(tblFace, {foreignKey: {allowNull: false}});
 tblDictContactType.hasMany(tblFaceContacts);
 tblFaceContacts.belongsTo(tblDictContactType, {foreignKey: {allowNull: false}});
 
+tblFace.hasMany(tblFaceEntranceExamin);
+tblFaceEntranceExamin.belongsTo(tblFace, {foreignKey: {allowNull: false}});
+
+tblDictSubject.hasMany(tblFaceEntranceExamin);
+tblFaceEntranceExamin.belongsTo(tblDictSubject, {foreignKey: {allowNull: false}});
+
+tblFace.hasMany(tblFaceAspirant);
+tblFaceAspirant.belongsTo(tblFace, {foreignKey: {allowNull: false}});
+
+tblDictSubject.hasMany(tblFaceAspirant);
+tblFaceAspirant.belongsTo(tblDictSubject, {foreignKey: {allowNull: false}});
+
+tblDictEducationForm.hasMany(tblFaceAspirant);
+tblFaceAspirant.belongsTo(tblDictEducationForm, {foreignKey: {allowNull: false}});
+
+tblDictSpecialty.hasMany(tblFaceAspirant);
+tblFaceAspirant.belongsTo(tblDictSpecialty);
+
+// описание древовидной модели специальностей
+tblDictSpecialty.hasMany(tblDictSpecialty, {
+    foreignKey: {field: 'parentId', name: 'parentId'},
+    onDelete: 'CASCADE', // если удалять то вместе с зависимыми ветками
+    as: 'children'
+});
+tblDictSpecialty.belongsTo(tblDictSpecialty, {
+    foreignKey: {field: 'parentId', name: 'parentId'},
+});
+
+tblDictSpecialty.belongsToMany(tblDictEnterprise, {through: 'tblDictSpecialty_tblDictEnterprise'});
+tblDictEnterprise.belongsToMany(tblDictSpecialty, {through: 'tblDictSpecialty_tblDictEnterprise'});
+
+tblFace.hasMany(tblAcademicAdvisor);
+tblAcademicAdvisor.belongsTo(tblFace, {foreignKey: {allowNull: false}});
+
+tblFace.hasMany(tblFaceScientificPublications);
+tblFaceScientificPublications.belongsTo(tblFace, {foreignKey: {allowNull: false}});
+
+tblFace.hasMany(tblFaceCertificationResult);
+tblFaceCertificationResult.belongsTo(tblFace, {foreignKey: {allowNull: false}});
+
+tblDictCertificationResult.hasMany(tblFaceCertificationResult);
+tblFaceCertificationResult.belongsTo(tblDictCertificationResult);
+
+tblFace.hasMany(tblFaceBusinessTrip);
+tblFaceBusinessTrip.belongsTo(tblFace, {foreignKey: {allowNull: false}});
+
+tblFace.hasMany(tblFaceExaminations);
+tblFaceExaminations.belongsTo(tblFace, {foreignKey: {allowNull: false}});
+
+tblDictSubject.hasMany(tblFaceExaminations);
+tblFaceExaminations.belongsTo(tblDictSubject, {foreignKey: {allowNull: false}});
+
+
 // экспорт моделей, для возможности использования в других файлах
 module.exports = {
     tblFace,
@@ -549,7 +641,17 @@ module.exports = {
     tblDictEnterprise,
     tblOrder,
     tblFace_tblOrder,
-
+    tblFaceEntranceExamin,
+    tblDictSubject,
+    tblFaceAspirant,
+    tblDictEducationForm,
+    tblDictSpecialty,
+    tblAcademicAdvisor,
+    tblFaceScientificPublications,
+    tblFaceCertificationResult,
+    tblDictCertificationResult,
+    tblFaceBusinessTrip,
+    tblFaceExaminations,
 }
 
 

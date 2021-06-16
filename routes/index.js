@@ -22,6 +22,7 @@ const dictEnterpriseRouter = require('./dictEnterpriseRouter');
 const dictEnterpriseAsTreeRouter = require('./dictEnterpriseAsTreeRouter');
 const orderRouter = require('./orderRouter');
 const faceOrderRouter = require('./faceOrderRouter');
+const dictSubjectRouter = require('./dictSubjectRouter');
 
 // в основном роутере необходимо указать подроутеры
 // первый параметр URL по которому роутер будет отрабатывать
@@ -49,6 +50,7 @@ router.use('/dict-street', dictStreetRouter );
 router.use('/dict-contact-type', dictContactTypeRouter );
 router.use('/dict-enterprise', dictEnterpriseRouter );
 router.use('/dict-enterprise-as-tree', dictEnterpriseAsTreeRouter );
+router.use('/dict-subject', dictSubjectRouter);
 
 
 module.exports = router;
