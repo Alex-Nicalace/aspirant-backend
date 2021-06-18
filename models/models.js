@@ -276,7 +276,7 @@ const tblDictContactType = sequelize.define('tblDictContactType', {
 // 15. структура факультетов и кафедр униыерситет. древовидная структура
 const tblDictEnterprise = sequelize.define('tblDictEnterprise', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    //parentId: {type: DataTypes.INTEGER},
+    parentId: {type: DataTypes.INTEGER},
     name: {
         type: DataTypes.STRING, allowNull: false, validate: {
             notNull: {args: true, msg: 'структура не может быть содержать пустые узлы'},  // не допусает значение NULL
@@ -343,15 +343,16 @@ const tblDictSubject = sequelize.define('tblDictSubject', {
         type: DataTypes.STRING, allowNull: false, validate: {
             notNull: {args: true, msg: 'не допускается пустое значение'},  // не допусает значение NULL
             notEmpty: {args: true, msg: 'не допускается пустая последовательность'} // не дупускает пустых псоледовательностей
-        }
+        },
+        unique: {msg: 'нарушение уникальности'},
     },
 })
 
 // 19 таблица, кот. содежит кандидатский минимум, либо вступительные экзамены
 const tblFaceEntranceExamin = sequelize.define('tblFaceEntranceExamin', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    //tblFaceId
-    //tblDictSubjectId
+    tblFaceId: {type: DataTypes.INTEGER},
+    tblDictSubjectId: {type: DataTypes.INTEGER},
     date: {
         type: DataTypes.DATEONLY, allowNull: false, validate: {
             notNull: {args: true, msg: 'поле ДАТА не допускается пустое значение'},  // не допусает значение NULL
@@ -377,22 +378,22 @@ const tblFaceEntranceExamin = sequelize.define('tblFaceEntranceExamin', {
 // 20 таблица, содержащая аспирантов
 const tblFaceAspirant = sequelize.define('tblFaceAspirant', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    //tblFaceId
+    tblFaceId: {type: DataTypes.INTEGER},
     isRecommendation: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
     isProtocol: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
     isAgree: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
     isHeadDepartment: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
-    //tblDictSubjectId
-    //tblDictEducationFormId
-    //tblDictSpecialty
+    tblDictSubjectId: {type: DataTypes.INTEGER},
+    tblDictEducationFormId: {type: DataTypes.INTEGER},
+    tblDictSpecialtyId: {type: DataTypes.INTEGER},
     dissertationTheme: {type: DataTypes.STRING(500)},
-    //tblAcademicAdvisorId
+    tblAcademicAdvisorId: {type: DataTypes.INTEGER},
 }, {
     indexes: [
         {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
         {unique: false, fields: ['tblDictSubjectId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
         {unique: false, fields: ['tblDictEducationFormId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
-        {unique: false, fields: ['tblDictSpecialty']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictSpecialtyId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
         {unique: false, fields: ['tblAcademicAdvisorId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
     ]
 })
@@ -401,7 +402,10 @@ const tblFaceAspirant = sequelize.define('tblFaceAspirant', {
 const tblDictEducationForm = sequelize.define('tblDictEducationForm', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     educationForm: {
-        type: DataTypes.STRING, allowNull: false, validate: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: {msg: 'нарушение уникальности'},
+        validate: {
             notNull: {args: true, msg: 'не допускается пустое значение'},  // не допусает значение NULL
             notEmpty: {args: true, msg: 'не допускается пустая последовательность'} // не дупускает пустых псоледовательностей
         }
@@ -411,7 +415,7 @@ const tblDictEducationForm = sequelize.define('tblDictEducationForm', {
 // 22 таблица специальностей иерархия
 const tblDictSpecialty = sequelize.define('tblDictSpecialty', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    // parentId
+    parentId: {type: DataTypes.INTEGER},
     name: {
         type: DataTypes.STRING, allowNull: false, validate: {
             notNull: {args: true, msg: 'не допускается пустое значение'},  // не допусает значение NULL
@@ -429,7 +433,7 @@ const tblDictSpecialty = sequelize.define('tblDictSpecialty', {
 // 23 таблица научных руководителей
 const tblAcademicAdvisor = sequelize.define('tblAcademicAdvisor', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    //tblFaceId
+    tblFaceId: {type: DataTypes.INTEGER},
 }, {
     indexes: [
         {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
@@ -439,7 +443,7 @@ const tblAcademicAdvisor = sequelize.define('tblAcademicAdvisor', {
 // 24 научные публикации
 const tblFaceScientificPublications = sequelize.define('tblFaceScientificPublications', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    //tblFaceId
+    tblFaceId: {type: DataTypes.INTEGER},
     date: {type: DataTypes.DATEONLY},
     info: {type: DataTypes.TEXT},
 }, {
@@ -456,13 +460,14 @@ const tblDictCertificationResult = sequelize.define('tblDictCertificationResult'
             notNull: {args: true, msg: 'не допускается пустое значение'},  // не допусает значение NULL
             notEmpty: {args: true, msg: 'не допускается пустая последовательность'} // не дупускает пустых псоледовательностей
         },
+        unique: {msg: 'нарушение уникальности'},
     }
 })
 
 // 26 аттестация за каждый проученный год
 const tblFaceCertificationResult = sequelize.define('tblFaceCertificationResult', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    //tblFaceId,
+    tblFaceId: {type: DataTypes.INTEGER},
     year: {
         type: DataTypes.INTEGER, allowNull: false, validate: {
             notNull: {args: true, msg: 'не допускается пустое значение'},  // не допусает значение NULL
@@ -479,7 +484,7 @@ const tblFaceCertificationResult = sequelize.define('tblFaceCertificationResult'
 // 27. сведения о командировках
 const tblFaceBusinessTrip = sequelize.define('tblFaceBusinessTrip', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    //tblFaceId,
+    tblFaceId: {type: DataTypes.INTEGER},
     date: {type: DataTypes.DATEONLY},
     info: {type: DataTypes.TEXT},
 }, {
@@ -491,8 +496,8 @@ const tblFaceBusinessTrip = sequelize.define('tblFaceBusinessTrip', {
 // 28. оценки по предметам по семестрам
 const tblFaceExaminations = sequelize.define('tblFaceExaminations', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    //tblFaceId,
-    //tblDictSubjectId,
+    tblFaceId: {type: DataTypes.INTEGER},
+    tblDictSubjectId: {type: DataTypes.INTEGER},
     estimate: {type: DataTypes.STRING},
     semesterNum: {type: DataTypes.INTEGER},
 }, {

@@ -1,28 +1,28 @@
-const {tblFaceEntranceExamin, tblDictSubject} = require('../models/models');
+const {tblFaceScientificPublications, tblFace, tblFaceName} = require('../models/models');
 const ApiError = require('../error/ApiError');
 const {Sequelize} = require("sequelize");
 const Crud = require('./Crud');
 
 // можно обойтись без класса создавая просто ф-ции, но
 // классы группируют
-class faceEntranceExamin {
+class faceScientificPublicationsController {
     async create(req, res, next) {
-        await Crud.create(req, res, next, tblFaceEntranceExamin);
+        await Crud.create(req, res, next, tblFaceScientificPublications);
     }
 
     async update(req, res, next) {
-        await Crud.update(req, res, next, tblFaceEntranceExamin)
+        await Crud.update(req, res, next, tblFaceScientificPublications)
     }
 
     async getOne(req, res, next) {
-        await Crud.getOne(req, res, next, tblFaceEntranceExamin)
+        await Crud.getOne(req, res, next, tblFaceScientificPublications)
 
     }
 
     async getAllOneFace(req, res, next) { // все записи для указанного лица
         const {faceId} = req.params;
         try {
-            const rec = await tblFaceEntranceExamin.findAll({
+            const rec = await tblFaceScientificPublications.findAll({
                 where: {
                     tblFaceId: faceId
                 },
@@ -32,8 +32,16 @@ class faceEntranceExamin {
                 // ],
                 include: [ // это типа соединение JOIN как в SQL
                     {
-                        model: tblDictSubject,
+                        model: tblFace,
+                        required: true,
                         //attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
+                        include: [
+                            {
+                                model: tblFaceName,
+                                order: [['dateOn', 'DESC']], // сортировка по убыванию, чтобы показать последнюю ФИО
+                                limit: 1, // взять у сортированного списка первую запись
+                            }
+                        ]
                     },
                 ],
                 order: [['dateFinished', 'DESC']],
@@ -46,13 +54,13 @@ class faceEntranceExamin {
     }
 
     async getAll(req, res, next) { // по идее незачем выводить все таблюцу но по аналогии со правочником пускай
-        await Crud.getAll(req, res, next, tblFaceEntranceExamin, [['date', 'ASC']])
+        await Crud.getAll(req, res, next, tblFaceScientificPublications, [['date', 'ASC']])
     }
 
     async delete(req, res, next) {
-        await Crud.delete(req, res, next, tblFaceEntranceExamin)
+        await Crud.delete(req, res, next, tblFaceScientificPublications)
     }
 }
 
 // на выходе новый объект, созданный из этого класса
-module.exports = new faceEntranceExamin()
+module.exports = new faceScientificPublicationsController()

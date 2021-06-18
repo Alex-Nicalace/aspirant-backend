@@ -23,6 +23,15 @@ const dictEnterpriseAsTreeRouter = require('./dictEnterpriseAsTreeRouter');
 const orderRouter = require('./orderRouter');
 const faceOrderRouter = require('./faceOrderRouter');
 const dictSubjectRouter = require('./dictSubjectRouter');
+const faceEntranceExaminRouter = require('./faceEntranceExaminRouter');
+const dictEducationFormRouter = require('./dictEducationFormRouter');
+const faceAspirantRouter = require('./faceAspirantRouter');
+const academicAdvisorRouter = require('./academicAdvisorRouter');
+const faceScientificPublicationsRouter = require('./faceScientificPublicationsRouter');
+const dictCertificationResultRouter = require('./dictCertificationResultRouter');
+const faceCertificationResultRouter = require('./faceCertificationResultRouter');
+const faceBusinessTripRouter = require('./faceBusinessTripRouter');
+const faceExaminationsRouter = require('./faceExaminationsRouter');
 
 // в основном роутере необходимо указать подроутеры
 // первый параметр URL по которому роутер будет отрабатывать
@@ -39,6 +48,13 @@ router.use('/face-work', faceWorkRouter);
 router.use('/face-residence', faceResidenceRouter);
 router.use('/face-contact', faceContactsRouter);
 router.use('/face-order', faceOrderRouter);
+router.use('/face-entrance-examin', faceEntranceExaminRouter);
+router.use('/face-aspirant', faceAspirantRouter);
+router.use('/face-academic-advisor', academicAdvisorRouter);
+router.use('/face-scientific-publ', faceScientificPublicationsRouter);
+router.use('/face-certification-result', faceCertificationResultRouter);
+router.use('/face-business-trip', faceBusinessTripRouter);
+router.use('/face-examinations', faceExaminationsRouter);
 
 router.use('/order', orderRouter);
 
@@ -51,6 +67,8 @@ router.use('/dict-contact-type', dictContactTypeRouter );
 router.use('/dict-enterprise', dictEnterpriseRouter );
 router.use('/dict-enterprise-as-tree', dictEnterpriseAsTreeRouter );
 router.use('/dict-subject', dictSubjectRouter);
+router.use('/dict-education-form', dictEducationFormRouter);
+router.use('/dict-certification-result', dictCertificationResultRouter);
 
 
 module.exports = router;
