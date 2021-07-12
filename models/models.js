@@ -10,6 +10,32 @@ const {DataTypes} = require('sequelize');
 // первый параметр название модели
 // второй объект -  описываются поля
 
+// 0. Таблица пользователей ПО
+const tblUser = sequelize.define('tblUser', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    login: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: {msg: 'поле "логин" должно быть уникальным"'},
+        validate: {
+            notNull: {args: true, msg: 'поле "логин" не может быть пустым'},  // не допусает значение NULL
+            notEmpty: {args: true, msg: 'поле "логин" содержит пустое значение'} // не дупускает пустых псоледовательностей
+        }
+    },
+    password: {
+        type: DataTypes.STRING, allowNull: false, validate: {
+            notNull: {args: true, msg: 'поле "пароль" не может быть пустым'},  // не допусает значение NULL
+            notEmpty: {args: true, msg: 'поле "пароль" содержит пустое значение'} // не дупускает пустых псоледовательностей
+        }
+    },
+    role: {
+        type: DataTypes.STRING, allowNull: false, validate: {
+            notNull: {args: true, msg: 'поле "роль" не может быть пустым'},  // не допусает значение NULL
+            notEmpty: {args: true, msg: 'поле "роль" содержит пустое значение'} // не дупускает пустых псоледовательностей
+        }
+    }
+})
+
 // 1. модель лицо
 const tblFace = sequelize.define('tblFace', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -657,6 +683,7 @@ module.exports = {
     tblDictCertificationResult,
     tblFaceBusinessTrip,
     tblFaceExaminations,
+    tblUser
 }
 
 
