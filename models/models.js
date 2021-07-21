@@ -95,6 +95,7 @@ const tblFaceDocument = sequelize.define('tblFaceDocument', {
     // внешние связи sequelize подставит сам
     dateOn: {type: DataTypes.DATEONLY},
     dateOff: {type: DataTypes.DATEONLY},
+    numDocument: {type: DataTypes.STRING },
 }, {
     indexes: [
         {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
@@ -310,7 +311,7 @@ const tblDictEnterprise = sequelize.define('tblDictEnterprise', {
         },
     },
     note: {type: DataTypes.STRING(500)},
-    whatIsIt: {type: DataTypes.STRING} // faculty, department
+    //whatIsIt: {type: DataTypes.STRING} // faculty, department
 }, {
     freezeTableName: true, // по умолч. библ. делает название таблицы = название модели во множественном числе. Эта опция отключает это поведение
     indexes: [

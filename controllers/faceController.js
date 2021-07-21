@@ -6,12 +6,48 @@ const Crud = require('./Crud');
 
 // можно обойтись без класса создавая просто ф-ции, но
 // классы группируют
-class faceController {
+
+class FaceController {
+    takeValuesFromField = function (arr, nameField) {
+        return arr.map(i => {
+            return i[nameField]
+        })
+    }
+
+    _getOneWithName = async (id) => {
+        // select one face with last name
+            return await tblFaceName.findAll({
+                attributes: [
+                    [Sequelize.col('tblFace.id'), 'id'],
+                    [Sequelize.col('tblFace.birthdate'), 'birthdate'],
+                    [Sequelize.col('tblFace.createdAt'), 'createdAt'],
+                    [Sequelize.col('tblFace.updatedAt'), 'updatedAt'],
+                    'lastname', 'firstname', 'middleName',
+                    [Sequelize.col('tblFaceName.dateOn'), 'nameDateOn'],
+                    [Sequelize.col('tblFaceName.id'), 'faceNameId'],
+                ],
+                where: {
+                    tblFaceId: id
+                },
+                order: [
+                    ['dateOn', 'DESC'] // сортировка по убыванию, чтобы показать последнюю ФИО
+                ],
+                limit: 1, // взять у сортированного списка первую запись
+                include: [
+                    {
+                        model: tblFace,
+                        attributes: [],
+                        required: true, // преобразовывая запрос из значения OUTER JOINпо умолчанию в запрос INNER JOIN
+                    }
+                ]
+            })
+    }
+
     async create(req, res, next) {
         await Crud.create(req, res, next, tblFace)
     }
 
-    async createFaceWithName(req, res, next) {
+    createFaceWithName = async (req, res, next) => {
         const {birthdate, sex, lastname, firstname, middleName} = req.body;
 
         try {
@@ -28,7 +64,7 @@ class faceController {
             // )
 
             // СИНТКАСИСС вставка пляска от главной таблицы
-            const rec = await tblFace.create({
+            const recCreated = await tblFace.create({
                 birthdate,
                 sex,
                 tblFaceNames: [{lastname, firstname, middleName, dateOn: birthdate}] //tblFaceNames название таблицы в СУБД
@@ -36,7 +72,15 @@ class faceController {
                 include: [tblFaceName]
             });
 
-            return res.json(rec);
+            const recCreatedWithName = await this._getOneWithName(recCreated.dataValues.id);
+            if (!recCreatedWithName)
+                return next(ApiError.internal('После создания лица не удается выбрать это лицо с ФИО!'))
+
+            // recCreated это грубя говоря объект - созданная запись
+            // recCreatedWithName это массив объектов - датасет. но известно что запись должна быть одной поэтому вы
+            // бираю первый элемент масива
+
+            return res.json(recCreatedWithName[0]); //т.к. ожидается одна сущность то это объект зачем массив
         } catch (e) {
             res.json(e);
         }
@@ -49,6 +93,17 @@ class faceController {
 
     async getOne(req, res, next) {
         await Crud.getOne(req, res, next, tblFace)
+
+    }
+
+    getOneWithName = async (req, res, next) => {
+        const {id} = req.params;
+        try {
+            const recordset = await this._getOneWithName(id)
+            return res.json(recordset[0]); //т.к. ожидается одна сущность то это объект зачем массив
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
 
     }
 
@@ -72,13 +127,7 @@ class faceController {
             return res.json(recordset);
         }*/
 
-    async getAll(req, res, next) {
-        const takeValuesFromField = (arr, nameField) => {
-            return arr.map(i => {
-                return i[nameField]
-            })
-        }
-
+    getAll = async (req, res, next) => {
         try {
             const recordset = await tblFaceName.findAll({
                 attributes: [
@@ -94,12 +143,14 @@ class faceController {
                             [Sequelize.col('tblFace.birthdate'), 'birthdate'],
                             [Sequelize.col('tblFace.createdAt'), 'createdAt'],
                             [Sequelize.col('tblFace.updatedAt'), 'updatedAt'],
-                            'lastname', 'firstname', 'middleName', 'dateOn'
+                            'lastname', 'firstname', 'middleName',
+                            [Sequelize.col('tblFaceName.dateOn'), 'nameDateOn'],
+                            [Sequelize.col('tblFaceName.id'), 'faceNameId'],
                         ],
                         where: {
                             [Op.and]: [
-                                {tblFaceId: {[Op.in]: takeValuesFromField(lastNames, 'tblFaceId')}},
-                                {dateOn: {[Op.in]: takeValuesFromField(lastNames, 'dateOn')}}],
+                                {tblFaceId: {[Op.in]: this.takeValuesFromField(lastNames, 'tblFaceId')}},
+                                {dateOn: {[Op.in]: this.takeValuesFromField(lastNames, 'dateOn')}}],
                         },
                         include: [
                             {
@@ -123,4 +174,4 @@ class faceController {
 }
 
 // на выходе новый объект, созданный из этого класса
-module.exports = new faceController()
+module.exports = new FaceController()
