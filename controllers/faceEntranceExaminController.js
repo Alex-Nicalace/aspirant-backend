@@ -6,43 +6,63 @@ const Crud = require('./Crud');
 // можно обойтись без класса создавая просто ф-ции, но
 // классы группируют
 class faceEntranceExamin {
-    async create(req, res, next) {
-        await Crud.create(req, res, next, tblFaceEntranceExamin);
+    getOnParams = async (params) => {
+        return await tblFaceEntranceExamin.findAll({
+            where: params,
+            attributes: [
+                'id', 'date', 'estimate', 'isСandidateMin', 'tblFaceId', 'tblDictSubjectId', 'createdAt', 'updatedAt',
+                [Sequelize.col('tblDictSubject.subject'), 'subject'], // указание поля из связной таблицы
+            ],
+            include: [ // это типа соединение JOIN как в SQL
+                {
+                    model: tblDictSubject,
+                    //attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
+                    required: true // преобразовывая запрос из значения OUTER JOINпо умолчанию в запрос INNER JOIN
+                },
+            ],
+            order: [['date', 'ASC']],
+        });
     }
 
-    async update(req, res, next) {
-        await Crud.update(req, res, next, tblFaceEntranceExamin)
+    create = async (req, res, next) => {
+        try {
+            const recCreated = await Crud.create(req, null, next, tblFaceEntranceExamin);
+            const dataset = await this.getOnParams({id: recCreated.id});
+            return res.json(dataset[0]);
+        } catch (e) {
+            next(ApiError.badRequest(e.message))
+        }
     }
 
-    async getOne(req, res, next) {
-        await Crud.getOne(req, res, next, tblFaceEntranceExamin)
+    update = async (req, res, next) => {
+        const updateRec = await Crud.update(req, null, next, tblFaceEntranceExamin);
+        try {
+            const dataset = await this.getOnParams({id: updateRec.id});
+            return res.json(dataset[0]);
+        } catch (e) {
+            next(ApiError.badRequest(e.message))
+        }
+    }
+
+    getOne = async (req, res, next) => {
+        const {id} = req.params;
+        try {
+            const dataset = await this.getOnParams({id})
+            return res.json(dataset[0]);
+        } catch (e) {
+            next(ApiError.badRequest(e.message))
+        }
 
     }
 
     async getAllOneFace(req, res, next) { // все записи для указанного лица
-        const {faceId} = req.params;
+        const {faceId: tblFaceId, isCandidateMin} = req.params /*req.query*/;
         try {
-            const rec = await tblFaceEntranceExamin.findAll({
-                where: {
-                    tblFaceId: faceId
-                },
-                // attributes: [
-                //     'id', 'dateFinished', 'specialty', 'isExcellent', 'quantitySatisfactory', 'tblDictEducationLevelId', 'createdAt', 'updatedAt',
-                //     [Sequelize.col('tblDictEducationLevel.educationLevel'), 'educationLevel'], // указание поля из связной таблицы
-                // ],
-                include: [ // это типа соединение JOIN как в SQL
-                    {
-                        model: tblDictSubject,
-                        //attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
-                    },
-                ],
-                order: [['dateFinished', 'DESC']],
-            });
-            return res.json(rec);
+            const recordset = await this.getOnParams({tblFaceId, isCandidateMin})
+            return res.json(recordset);
         } catch (e) {
             next(ApiError.badRequest(e.message));
         }
-
     }
 
     async getAll(req, res, next) { // по идее незачем выводить все таблюцу но по аналогии со правочником пускай

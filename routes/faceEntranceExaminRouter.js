@@ -4,7 +4,7 @@ const Controller = require('../controllers/faceEntranceExaminController');
 
 router.post('/', Controller.create);
 router.get('/:id', Controller.getOne);
-router.get('/faceId/:faceId', Controller.getAllOneFace);
+router.get('/faceId/:faceId/:isCandidateMin', Controller.getAllOneFace);
 router.put('/', Controller.update);
 router.delete('/:id', Controller.delete);
 

@@ -390,7 +390,7 @@ const tblFaceEntranceExamin = sequelize.define('tblFaceEntranceExamin', {
             notNull: {args: true, msg: 'поле ДАТА не допускается пустое значение'},  // не допусает значение NULL
         }
     },
-    isСandidateMin: {
+    isCandidateMin: {
         type: DataTypes.BOOLEAN, allowNull: false, validate: {
             notNull: {args: true, msg: 'поле ДАТА не допускается пустое значение'},  // не допусает значение NULL
         }

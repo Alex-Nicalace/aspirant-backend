@@ -34,7 +34,7 @@ class faceDocumentController {
     create = async (req, res, next) => {
         //await Crud.create(req, res, next, tblFaceDocument);
         try {
-            const recCreated = await tblFaceDocument.create({...req.body});
+            const recCreated = await Crud.create(req, null, next, tblFaceDocument);// await tblFaceDocument.create({...req.body});
             const dataset = await this.getOnParams({id: recCreated.id});
             return res.json(dataset[0]);
         } catch (e) {
@@ -43,7 +43,7 @@ class faceDocumentController {
     }
 
     update = async (req, res, next) => {
-        const updateRec = await Crud.updateWithoutRes(req, next, tblFaceDocument);
+        const updateRec = await Crud.update(req, null, next, tblFaceDocument);
         try {
             const dataset = await this.getOnParams({id: updateRec.id});
             return res.json(dataset[0]);
@@ -68,31 +68,9 @@ class faceDocumentController {
         const {faceId: tblFaceId} = req.params;
         try {
             const rec = await this.getOnParams({tblFaceId})
-            /*await tblFaceDocument.findAll({
-                where: {
-                    tblFaceId: faceId
-                },
-                attributes: [
-                    'id', 'dateOn', 'dateOff', 'createdAt', 'updatedAt',
-                    [Sequelize.col('tblDictCountry.country'), 'country'], // указание поля из связной таблицы
-                    [Sequelize.col('tblDictDoc.document'), 'document'], // указание поля из связной таблицы
-                ],
-                include: [
-                    {
-                        model: tblDictCountry,
-                        attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
-                    },
-                    {
-                        model: tblDictDoc,
-                        attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
-                    }
-                ],
-                order: [['dateOn', 'ASC']],
-            });*/
             return res.json(rec);
         } catch (e) {
             next(ApiError.badRequest(e.message))
-
         }
     }
 

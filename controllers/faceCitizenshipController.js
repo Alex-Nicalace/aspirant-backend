@@ -29,7 +29,7 @@ class faceCitizenshipController {
     create = async (req, res, next) => {
         //await Crud.create(req, res, next, tblFaceCitizenship);
         try{
-            const recCreated = await tblFaceCitizenship.create({...req.body});
+            const recCreated = await Crud.create(req, null, next, tblFaceCitizenship);
             const dataset = await this.getOnParams({id: recCreated.id});
             return res.json(dataset[0]);
         }catch (e) {
@@ -38,7 +38,7 @@ class faceCitizenshipController {
     }
 
     update = async (req, res, next) => {
-        const updateRec = await Crud.updateWithoutRes(req, next, tblFaceCitizenship);
+        const updateRec = await Crud.update(req, null, next, tblFaceCitizenship);
         try {
             const dataset = await this.getOnParams({id: updateRec.id});
             return res.json(dataset[0]);
@@ -62,24 +62,6 @@ class faceCitizenshipController {
         const {faceId: tblFaceId} = req.params /*req.query*/;
         try {
             const recordset = await this.getOnParams({tblFaceId})
-            // const recordset = await tblFaceCitizenship.findAll({
-            //     where: {
-            //         tblFaceId: faceId
-            //     },
-            //     attributes: [ // указание какие поля необходимо вывести
-            //         'id', 'createdAt', 'updatedAt', 'tblFaceId', 'tblDictCountryId',
-            //         [Sequelize.col('tblDictCountry.country'), 'citizenship'] // указание поля из связной таблицы
-            //
-            //     ],
-            //     include: [
-            //         {
-            //             model: tblDictCountry,
-            //             attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
-            //             //as: 'Citizenship'
-            //             required: true // преобразовывая запрос из значения OUTER JOINпо умолчанию в запрос INNER JOIN
-            //         },
-            //     ]
-            // });
             return res.json(recordset);
         } catch (e) {
             next(ApiError.badRequest(e.message));

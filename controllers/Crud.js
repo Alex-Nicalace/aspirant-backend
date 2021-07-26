@@ -4,7 +4,7 @@ class Crud {
     async create(req, res, next, model) {
         try {
             const rec = await model.create({...req.body});
-            return res.json(rec);
+            return res ? res.json(rec) : rec;
         } catch (e) {
             next(ApiError.badRequest(e.message))
         }
@@ -22,7 +22,7 @@ class Crud {
 
         try {
             await rec.save();
-            return res.json(rec);
+            return res ? res.json(rec) : rec;
         } catch (error) {
             next(ApiError.badRequest(error.message))
         }
