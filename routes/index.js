@@ -32,6 +32,8 @@ const dictCertificationResultRouter = require('./dictCertificationResultRouter')
 const faceCertificationResultRouter = require('./faceCertificationResultRouter');
 const faceBusinessTripRouter = require('./faceBusinessTripRouter');
 const faceExaminationsRouter = require('./faceExaminationsRouter');
+const dictDirectionRouter = require('./dictDirectionRouter');
+const dictDirectionalityAndSpecialtyRouter = require('./dictDirectionalityAndSpecialtyRouter');
 
 // в основном роутере необходимо указать подроутеры
 // первый параметр URL по которому роутер будет отрабатывать
@@ -69,6 +71,8 @@ router.use('/dict-enterprise-as-tree', dictEnterpriseAsTreeRouter );
 router.use('/dict-subject', dictSubjectRouter);
 router.use('/dict-education-form', dictEducationFormRouter);
 router.use('/dict-certification-result', dictCertificationResultRouter);
+router.use('/dict-direction', dictDirectionRouter);
+router.use('/dict-directionality-and-specialty', dictDirectionalityAndSpecialtyRouter);
 
 
 module.exports = router;

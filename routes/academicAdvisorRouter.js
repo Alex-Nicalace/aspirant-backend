@@ -3,6 +3,7 @@ const router = new Router() // создаю объект этого роутер
 const Controller = require('../controllers/academicAdvisorController');
 
 router.post('/', Controller.create);
+router.get('/', Controller.getAllFace);
 router.get('/:id', Controller.getOne);
 router.get('/faceId/:faceId', Controller.getAllOneFace);
 router.put('/', Controller.update);

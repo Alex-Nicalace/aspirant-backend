@@ -6,42 +6,71 @@ const Crud = require('./Crud');
 // можно обойтись без класса создавая просто ф-ции, но
 // классы группируют
 class academicAdvisorController {
-    async create(req, res, next) {
-        await Crud.create(req, res, next, tblAcademicAdvisor);
-    }
-
-    async update(req, res, next) {
-        await Crud.update(req, res, next, tblAcademicAdvisor)
-    }
-
-    async getOne(req, res, next) {
-        await Crud.getOne(req, res, next, tblAcademicAdvisor)
-
-    }
-
-    async getAllOneFace(req, res, next) { // все записи для указанного лица
-        const {faceId} = req.params;
-        try {
-            const rec = await tblAcademicAdvisor.findAll({
-                where: {
-                    tblFaceId: faceId
+    getOnParams = async (params) => {
+        return await tblAcademicAdvisor.findAll({
+            where: params,
+            include: [ // это типа соединение JOIN как в SQL
+                {
+                    model: tblFace,
+                    required: true, // преобразовывая запрос из значения OUTER JOINпо умолчанию в запрос INNER JOIN
+                    include: [
+                        {
+                            model: tblFaceName,
+                            order: [['dateOn', 'DESC']], // сортировка по убыванию, чтобы показать последнюю ФИО
+                            limit: 1, // взять у сортированного списка первую запись
+                        }
+                    ]
                 },
-                include: [ // это типа соединение JOIN как в SQL
-                    {
-                        model: tblFace,
-                        required: true, // преобразовывая запрос из значения OUTER JOINпо умолчанию в запрос INNER JOIN
-                        include: [
-                            {
-                                model: tblFaceName,
-                                order: [['dateOn', 'DESC']], // сортировка по убыванию, чтобы показать последнюю ФИО
-                                limit: 1, // взять у сортированного списка первую запись
-                            }
-                        ]
-                    },
-                ],
-                order: [['createdAt', 'DESC']],
-            });
-            return res.json(rec);
+            ],
+            //order: [['createdAt', 'DESC']],
+        });
+    }
+
+    create = async (req, res, next) => {
+        try {
+            const recCreated = await Crud.create(req, null, next, tblAcademicAdvisor);
+            const dataset = await this.getOnParams({id: recCreated.id});
+            return res.json(dataset[0]);
+        } catch (e) {
+            next(ApiError.badRequest(e.message))
+        }
+    }
+
+    update = async (req, res, next) => {
+        const updateRec = await Crud.update(req, null, next, tblAcademicAdvisor);
+        try {
+            const dataset = await this.getOnParams({id: updateRec.id});
+            return res.json(dataset[0]);
+        } catch (e) {
+            next(ApiError.badRequest(e.message))
+        }
+    }
+
+    getOne = async (req, res, next) => {
+        const {id} = req.params;
+        try {
+            const dataset = await this.getOnParams({id})
+            return res.json(dataset[0]);
+        } catch (e) {
+            next(ApiError.badRequest(e.message))
+        }
+    }
+
+    getAllOneFace = async (req, res, next) => {
+        const {faceId: tblFaceId} = req.params;
+        try {
+            const recordset = await this.getOnParams({tblFaceId})
+            return res.json(recordset);
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
+
+    }
+
+    getAllFace = async (req, res, next) => {
+        try {
+            const recordset = await this.getOnParams()
+            return res.json(recordset);
         } catch (e) {
             next(ApiError.badRequest(e.message));
         }

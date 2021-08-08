@@ -8,6 +8,9 @@ const {Sequelize} = require("sequelize");
 // классы группируют
 class dictEnterpriseController {
     async create(req, res, next) {
+        //const rec = await model.create({...req.body});
+        // const {parentId} = req.body;
+        // typeof(parentId) !== 'number' && (req.body.parentId = null)
         await Crud.create(req, res, next, tblDictEnterprise);
     }
 
@@ -38,6 +41,17 @@ class dictEnterpriseController {
         return m
     }
 
+    getFullName = async(id, str = null) => {
+        //let result = '';
+        const t = await tblDictEnterprise.findByPk(id);
+        const patentId = t.parentId;
+        const result =  (str ? str + ', ' : '')   + t.name
+        if (patentId) {
+            return await this.getFullName(patentId, result)
+        }
+        return result
+    }
+
     getTreeBranch = async (req, res, next) => { // если неьбходимо выести указанную ветку
         const {id} = req.params;
         try {
@@ -66,7 +80,7 @@ class dictEnterpriseController {
 
     getTreeAll = async (req, res, next) => { // если необходимо вывести все дерево
         try {
-            const recordset = await this.getBranch(null);
+            const recordset = await this.getBranch(null); //await this.getFullName(6)
             res.send(recordset);
         } catch (e) {
             next(ApiError.badRequest(e.message))

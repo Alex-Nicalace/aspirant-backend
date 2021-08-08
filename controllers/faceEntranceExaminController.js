@@ -2,6 +2,7 @@ const {tblFaceEntranceExamin, tblDictSubject} = require('../models/models');
 const ApiError = require('../error/ApiError');
 const {Sequelize} = require("sequelize");
 const Crud = require('./Crud');
+const {stringToBoolean} = require("../utils/utils");
 
 // можно обойтись без класса создавая просто ф-ции, но
 // классы группируют
@@ -10,13 +11,13 @@ class faceEntranceExamin {
         return await tblFaceEntranceExamin.findAll({
             where: params,
             attributes: [
-                'id', 'date', 'estimate', 'isСandidateMin', 'tblFaceId', 'tblDictSubjectId', 'createdAt', 'updatedAt',
+                'id', 'date', 'estimate', 'isCandidateMin', 'tblFaceId', 'tblDictSubjectId', 'createdAt', 'updatedAt',
                 [Sequelize.col('tblDictSubject.subject'), 'subject'], // указание поля из связной таблицы
             ],
             include: [ // это типа соединение JOIN как в SQL
                 {
                     model: tblDictSubject,
-                    //attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
+                    attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
                     required: true // преобразовывая запрос из значения OUTER JOINпо умолчанию в запрос INNER JOIN
                 },
             ],
@@ -55,8 +56,9 @@ class faceEntranceExamin {
 
     }
 
-    async getAllOneFace(req, res, next) { // все записи для указанного лица
-        const {faceId: tblFaceId, isCandidateMin} = req.params /*req.query*/;
+    getAllOneFace = async (req, res, next) => {
+        const {faceId: tblFaceId, isCandidateMin: isCandidateMinStr} = req.params /*req.query*/;
+        const isCandidateMin=stringToBoolean(isCandidateMinStr);
         try {
             const recordset = await this.getOnParams({tblFaceId, isCandidateMin})
             return res.json(recordset);

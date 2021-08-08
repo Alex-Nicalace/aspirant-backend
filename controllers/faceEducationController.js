@@ -19,7 +19,7 @@ class faceEducationController {
                     attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
                 },
             ],
-            order: [['dateFinished', 'DESC']],
+            //order: [['dateFinished', 'DESC']],
         });
     }
 

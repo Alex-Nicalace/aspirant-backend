@@ -1,4 +1,4 @@
-const {tblFaceBusinessTrip } = require('../models/models');
+const {tblFaceBusinessTrip} = require('../models/models');
 const ApiError = require('../error/ApiError');
 const {Sequelize} = require("sequelize");
 const Crud = require('./Crud');
@@ -6,29 +6,47 @@ const Crud = require('./Crud');
 // можно обойтись без класса создавая просто ф-ции, но
 // классы группируют
 class FaceBusinessTripController {
-    async create(req, res, next) {
-        await Crud.create(req, res, next, tblFaceBusinessTrip);
+    getOnParams = async (params) => {
+        return await tblFaceBusinessTrip.findAll({
+            where: params,
+        });
     }
 
-    async update(req, res, next) {
-        await Crud.update(req, res, next, tblFaceBusinessTrip)
-    }
-
-    async getOne(req, res, next) {
-        await Crud.getOne(req, res, next, tblFaceBusinessTrip)
-
-    }
-
-    async getAllOneFace(req, res, next) { // все записи для указанного лица
-        const {faceId} = req.params;
+    create = async (req, res, next) => {
         try {
-            const rec = await tblFaceBusinessTrip.findAll({
-                where: {
-                    tblFaceId: faceId
-                },
-                order: [['date', 'DESC']],
-            });
-            return res.json(rec);
+            const recCreated = await Crud.create(req, null, next, tblFaceBusinessTrip);
+            const dataset = await this.getOnParams({id: recCreated.id});
+            return res.json(dataset[0]);
+        } catch (e) {
+            next(ApiError.badRequest(e.message))
+        }
+    }
+
+    update = async (req, res, next) => {
+        const updateRec = await Crud.update(req, null, next, tblFaceBusinessTrip);
+        try {
+            const dataset = await this.getOnParams({id: updateRec.id});
+            return res.json(dataset[0]);
+        } catch (e) {
+            next(ApiError.badRequest(e.message))
+        }
+    }
+
+    getOne = async (req, res, next) => {
+        const {id} = req.params;
+        try {
+            const dataset = await this.getOnParams({id})
+            return res.json(dataset[0]);
+        } catch (e) {
+            next(ApiError.badRequest(e.message))
+        }
+    }
+
+    getAllOneFace = async (req, res, next) => {
+        const {faceId: tblFaceId} = req.params;
+        try {
+            const recordset = await this.getOnParams({tblFaceId})
+            return res.json(recordset);
         } catch (e) {
             next(ApiError.badRequest(e.message));
         }
