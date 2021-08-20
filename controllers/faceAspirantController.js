@@ -8,14 +8,42 @@ const {
     tblDictEnterprise,
     tblFace,
     tblFaceName,
+    tblFace_tblOrder,
+    tblOrder
 } = require('../models/models');
 const ApiError = require('../error/ApiError');
 const {Sequelize} = require("sequelize");
 const Crud = require('./Crud');
+const {Op} = require("sequelize");
+//const {takeValuesFromField} = require("../utils/utils");
 
 // можно обойтись без класса создавая просто ф-ции, но
 // классы группируют
 class faceAspirantController {
+    buildConditionLastRecords = async (params = null) => {
+        const lastRecords = await tblFaceAspirant.findAll({
+            where: params,
+            attributes: [
+                'tblFaceId',
+                [Sequelize.fn('max', Sequelize.col('dateOn')), 'dateOn']
+            ],
+            group: 'tblFaceId',
+        })
+
+        const buildWhere = (recordset) => {
+            let result = [];
+
+            recordset.forEach(i => {
+                result.push({[Op.and]: [{tblFaceId: i.tblFaceId}, {dateOn: i.dateOn}]})
+            });
+            return result;
+        }
+
+        return {
+            [Op.or]: buildWhere(lastRecords)
+        }
+    }
+
     getOnParams = async (params) => {
         return await tblFaceAspirant.findAll({
             where: params,
@@ -71,15 +99,51 @@ class faceAspirantController {
                             ]
                         }
                     ]
-                }
+                },
+                // ниже привязка к приказам
+                {
+                    model: tblFace_tblOrder,
+                    attributes: ['typeRel', 'note', 'id'],
+                    include: [
+                        {
+                            attributes: ['numOrder', 'dateOrder', 'text'],
+                            model: tblOrder
+                        }
+                    ]
+                },
+                {
+                    model: tblFace,
+                    required: true, // преобразовывая запрос из значения OUTER JOINпо умолчанию в запрос INNER JOIN
+                    include: [
+                        {
+                            model: tblFaceName,
+                            order: [['dateOn', 'DESC']], // сортировка по убыванию, чтобы показать последнюю ФИО
+                            limit: 1, // взять у сортированного списка первую запись
+                        }
+                    ]
+                },
             ],
-            order: [['createdAt', 'DESC']],
+            //order: [['createdAt', 'DESC']],
         });
     }
 
     create = async (req, res, next) => {
         try {
             const recCreated = await Crud.create(req, null, next, tblFaceAspirant);
+            const {face_order} = req.body;
+            if (face_order) {
+                //если имеются данные о свзи с приказами ,то сохранить эти данные
+                if (face_order.hasOwnProperty('arr'))
+                    if (face_order.arr.length > 0) {
+                        for (const i of face_order.arr) {
+                            await tblFace_tblOrder.create({
+                                ...i,
+                                tblFaceAspirantId: recCreated.id,
+                                tblFaceId: recCreated.tblFaceId
+                            });
+                        }
+                    }
+            }
             const dataset = await this.getOnParams({id: recCreated.id});
             return res.json(dataset[0]);
         } catch (e) {
@@ -118,8 +182,15 @@ class faceAspirantController {
 
     }
 
-    async getAll(req, res, next) { // по идее незачем выводить все таблюцу но по аналогии со правочником пускай
-        await Crud.getAll(req, res, next, tblFaceAspirant, [['dateFinished', 'DESC']])
+    getAll = async (req, res, next) => { // по идее незачем выводить все таблюцу но по аналогии со правочником пускай
+        try {
+            const condition = await this.buildConditionLastRecords();
+            const recordset = await this.getOnParams(condition);
+            return res.json(recordset);
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
+
     }
 
     async delete(req, res, next) {

@@ -348,30 +348,42 @@ const tblOrder = sequelize.define('tblOrder', {
 })
 
 // 17. промежуточная таблица для формирорвания многий-ко-многим лица в приказах
-const tblFace_tblOrder = sequelize.define('tblFace_tblOrder', {
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    tblFaceId: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: tblFace,
-            key: 'id'
-        }
-    },
-    tblOrderId: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: tblOrder,
-            key: 'id'
-        }
-    },
-    note: {type: DataTypes.STRING}
-}, {
-    freezeTableName: true, // по умолч. библ. делает название таблицы = название модели во множественном числе. Эта опция отключает это поведение
-    indexes: [
-        {unique: false, fields: ['tblFaceId']}, // индекс по полю
-        {unique: false, fields: ['tblOrderId']} // индекс по полю
-    ]
-})
+// const tblFaceAspirant_tblOrder = sequelize.define('tblFaceAspirants_tblOrder', {
+//     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+//     tblFaceAspirantId: {
+//         type: DataTypes.INTEGER,
+//         allowNull: false,
+//         references: {
+//             model: tblFaceAspirant,
+//             key: 'id'
+//         }
+//     },
+//     tblOrderId: {
+//         type: DataTypes.INTEGER,
+//         allowNull: false,
+//         references: {
+//             model: tblOrder,
+//             key: 'id'
+//         }
+//     },
+//     typeRel: {
+//         type: DataTypes.STRING,
+//         allowNull: false,
+//         defaultValue: 'in',
+//         validate: {
+//             notNull: {args: true, msg: 'необходимо указать какого типа узел'},  // не допусает значение NULL
+//             notEmpty: {args: true, msg: 'необходимо указать какого типа узел'}, // не дупускает пустых псоледовательностей
+//             isIn: [['in', 'out', 'reIn']] // зачислен, отчислен, перевод
+//         },
+//     },
+//     note: {type: DataTypes.STRING}
+// }, {
+//     freezeTableName: true, // по умолч. библ. делает название таблицы = название модели во множественном числе. Эта опция отключает это поведение
+//     indexes: [
+//         {unique: false, fields: ['tblFaceAspirantId']}, // индекс по полю
+//         {unique: false, fields: ['tblOrderId']} // индекс по полю
+//     ]
+// })
 
 // 18. справосник предметов обучения
 const tblDictSubject = sequelize.define('tblDictSubject', {
@@ -430,6 +442,8 @@ const tblFaceAspirant = sequelize.define('tblFaceAspirant', {
         },
     },
     tblAcademicAdvisorId: {type: DataTypes.INTEGER},
+    dateOn: {type: DataTypes.DATEONLY,},
+    dateOff: {type: DataTypes.DATEONLY,},
 }, {
     indexes: [
         {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
@@ -438,7 +452,53 @@ const tblFaceAspirant = sequelize.define('tblFaceAspirant', {
         {unique: false, fields: ['tblDictDirectionalityAndSpecialtyId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
         {unique: false, fields: ['tblAcademicAdvisorId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
     ]
+});
+
+// 17. промежуточная таблица для формирорвания многий-ко-многим лица в приказах
+const tblFace_tblOrder = sequelize.define('tblFace_tblOrder', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    tblFaceId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: tblFace,
+            key: 'id'
+        }
+    },
+    tblOrderId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: tblOrder,
+            key: 'id'
+        }
+    },
+    // tblFaceAspirantId: {
+    //     type: DataTypes.INTEGER,
+    //     //allowNull: false,
+    //     // references: {
+    //     //     model: tblFaceAspirant,
+    //     //     key: 'id'
+    //     // }
+    // },
+    typeRel: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'in',
+        validate: {
+            notNull: {args: true, msg: 'необходимо указать какого типа узел'},  // не допусает значение NULL
+            notEmpty: {args: true, msg: 'необходимо указать какого типа узел'}, // не дупускает пустых псоледовательностей
+            isIn: [['in', 'out', 'reIn']] // зачислен, отчислен, перевод
+        },
+    },
+    note: {type: DataTypes.STRING}
+}, {
+    freezeTableName: true, // по умолч. библ. делает название таблицы = название модели во множественном числе. Эта опция отключает это поведение
+    indexes: [
+        {unique: false, fields: ['tblFaceId']}, // индекс по полю
+        {unique: false, fields: ['tblOrderId']}, // индекс по полю
+        // {unique: false, fields: ['tblFaceAspirantId']} // индекс по полю
+    ]
 })
+
 
 // 21 справочник форм образования
 const tblDictEducationForm = sequelize.define('tblDictEducationForm', {
@@ -597,15 +657,22 @@ tblFace.belongsToMany(tblOrder, {through: tblFace_tblOrder /*табл. связ�
 tblOrder.belongsToMany(tblFace, {through: tblFace_tblOrder});
 
 tblFace.hasMany(tblFace_tblOrder, {foreignKey: {allowNull: false}});
-tblFace_tblOrder.belongsTo(tblFace, {
-    foreignKey: {allowNull: false}
-}/*чтобы не допускать пустого ключа*/);
+tblFace_tblOrder.belongsTo(tblFace, {foreignKey: {allowNull: false}}/*чтобы не допускать пустого ключа*/);
 
 tblOrder.hasMany(tblFace_tblOrder, {foreignKey: {allowNull: false}});
-tblFace_tblOrder.belongsTo(tblOrder, {
-    foreignKey: {allowNull: false}
-}/*чтобы не допускать пустого ключа*/);
+tblFace_tblOrder.belongsTo(tblOrder, {foreignKey: {allowNull: false}}/*чтобы не допускать пустого ключа*/);
 
+tblFaceAspirant.hasMany(tblFace_tblOrder);
+tblFace_tblOrder.belongsTo(tblFaceAspirant);
+
+// tblFaceAspirant.belongsToMany(tblOrder, {through: tblFaceAspirant_tblOrder /*табл. связующая*/});
+// tblOrder.belongsToMany(tblFaceAspirant, {through: tblFaceAspirant_tblOrder});
+//
+// tblFaceAspirant.hasMany(tblFaceAspirant_tblOrder, {foreignKey: {allowNull: false}});
+// tblFaceAspirant_tblOrder.belongsTo(tblFaceAspirant, {foreignKey: {allowNull: false}}/*чтобы не допускать пустого ключа*/);
+//
+// tblOrder.hasMany(tblFaceAspirant_tblOrder, {foreignKey: {allowNull: false}});
+// tblFaceAspirant_tblOrder.belongsTo(tblOrder, {foreignKey: {allowNull: false}}/*чтобы не допускать пустого ключа*/);
 
 // описание древовидной модели
 tblDictEnterprise.hasMany(tblDictEnterprise, {
@@ -753,6 +820,7 @@ module.exports = {
     tblDictEnterprise,
     tblOrder,
     tblFace_tblOrder,
+    //tblFaceAspirant_tblOrder,
     tblFaceEntranceExamin,
     tblDictSubject,
     tblFaceAspirant,

@@ -36,7 +36,7 @@ const start = async () => {
             // сервер не отвечае при указании одной из опций
         );
 
-        app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+        app.listen(PORT, () => console.log(`Server started on port http://localhost:${PORT}`));
     } catch (e) {
 
     }

@@ -9,6 +9,7 @@ router.post('/', controller.create);
 router.get('/', controller.getAll);
 router.get('/faceId/:faceId', controller.getAllOneFace);
 router.get('/orderId/:orderId', controller.getAllOneOrder);
+router.get('/faceAspirantId/:faceAspirantId', controller.getAllOneRecFaceAspirant);
 router.get('/:id', controller.getOne);
 router.delete('/:id', controller.delete);
 router.put('/', controller.update);

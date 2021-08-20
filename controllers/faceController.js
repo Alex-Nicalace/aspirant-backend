@@ -3,16 +3,17 @@ const ApiError = require('../error/ApiError');
 const {Op} = require("sequelize");
 const {Sequelize} = require("sequelize");
 const Crud = require('./Crud');
+const {takeValuesFromField} = require("../utils/utils");
 
 // можно обойтись без класса создавая просто ф-ции, но
 // классы группируют
 
 class FaceController {
-    takeValuesFromField = function (arr, nameField) {
-        return arr.map(i => {
-            return i[nameField]
-        })
-    }
+    // takeValuesFromField = function (arr, nameField) {
+    //     return arr.map(i => {
+    //         return i[nameField]
+    //     })
+    // }
 
     _getOneWithName = async (id) => {
         // select one face with last name
@@ -129,6 +130,17 @@ class FaceController {
 
     getAll = async (req, res, next) => {
         try {
+            const buildWhere = (recordset) => {
+                let result = [];
+
+                recordset.forEach(i => {
+                    result.push({[Op.and]: [{tblFaceId: i.tblFaceId}, {dateOn: i.dateOn}]})
+                });
+                return {
+                    [Op.or]: result
+                }
+            }
+
             const recordset = await tblFaceName.findAll({
                 attributes: [
                     'tblFaceId', //'lastName',
@@ -147,11 +159,7 @@ class FaceController {
                             [Sequelize.col('tblFaceName.dateOn'), 'nameDateOn'],
                             [Sequelize.col('tblFaceName.id'), 'faceNameId'],
                         ],
-                        where: {
-                            [Op.and]: [
-                                {tblFaceId: {[Op.in]: this.takeValuesFromField(lastNames, 'tblFaceId')}},
-                                {dateOn: {[Op.in]: this.takeValuesFromField(lastNames, 'dateOn')}}],
-                        },
+                        where: buildWhere(lastNames),
                         include: [
                             {
                                 model: tblFace,

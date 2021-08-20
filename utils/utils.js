@@ -15,4 +15,10 @@ function stringToBoolean (string) {
     }
 }
 
-module.exports = {stringToBoolean}
+takeValuesFromField = function (arr, nameField) {
+    return arr.map(i => {
+        return i[nameField]
+    })
+}
+
+module.exports = {stringToBoolean, takeValuesFromField}

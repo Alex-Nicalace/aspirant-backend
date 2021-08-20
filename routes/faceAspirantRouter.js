@@ -5,6 +5,7 @@ const Controller = require('../controllers/faceAspirantController');
 router.post('/', Controller.create);
 router.get('/:id', Controller.getOne);
 router.get('/faceId/:faceId', Controller.getAllOneFace);
+router.get('/', Controller.getAll);
 router.put('/', Controller.update);
 router.delete('/:id', Controller.delete);
 

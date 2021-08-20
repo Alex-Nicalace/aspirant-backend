@@ -1,6 +1,7 @@
 const {tblFace_tblOrder, tblOrder, tblFace} = require('../models/models');
 const ApiError = require('../error/ApiError');
 const Crud = require('./Crud');
+const {tblFaceAspirant} = require("../models/models");
 const {tblFaceName} = require("../models/models");
 const {Sequelize} = require("sequelize");
 
@@ -14,6 +15,8 @@ class Controller {
                 'id',
                 'tblFaceId',
                 'tblOrderId',
+                'tblFaceAspirantId',
+                'typeRel',
                 'note',
                 'createdAt',
                 'updatedAt',
@@ -82,7 +85,17 @@ class Controller {
 
     create = async (req, res, next) => {
         try {
-            const recCreated = await Crud.create(req, null, next, tblFace_tblOrder);
+            const {tblFaceAspirantId} = req.body;
+            const values = {};
+            if (tblFaceAspirantId) {
+               const {tblFaceId} = await tblFaceAspirant.findByPk(tblFaceAspirantId);
+               if (!tblFaceId) {
+                   return next(ApiError.badRequest('не удалось найти лицо'))
+               }
+               values.tblFaceId = tblFaceId;
+            }
+            const recCreated = await tblFace_tblOrder.create({...req.body, ...values});
+            //const recCreated = await Crud.create(req, null, next, tblFace_tblOrder);
             const dataset = await this.getOnParams({id: recCreated.id});
             return res.json(dataset[0]);
         } catch (e) {
@@ -124,6 +137,17 @@ class Controller {
         const tblFaceId = isNaN(faceId) ? null : faceId
         try {
             const recordset = await this.getOnParams({tblFaceId})
+            return res.json(recordset);
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
+    }
+
+    getAllOneRecFaceAspirant = async (req, res, next) => {
+        const {faceAspirantId} = req.params /*req.query*/;
+        const tblFaceAspirantId = isNaN(faceAspirantId) ? null : faceAspirantId
+        try {
+            const recordset = await this.getOnParams({tblFaceAspirantId})
             return res.json(recordset);
         } catch (e) {
             next(ApiError.badRequest(e.message));
