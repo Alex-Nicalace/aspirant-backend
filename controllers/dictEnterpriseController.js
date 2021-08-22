@@ -9,12 +9,17 @@ const {Sequelize} = require("sequelize");
 class dictEnterpriseController {
     async create(req, res, next) {
         //const rec = await model.create({...req.body});
-        // const {parentId} = req.body;
+        const {id, parentId} = req.body;
+        if (id === parentId)
+            return next(ApiError.badRequest('Нарушение логики структуры!'));
         // typeof(parentId) !== 'number' && (req.body.parentId = null)
         await Crud.create(req, res, next, tblDictEnterprise);
     }
 
     async update(req, res, next) {
+        const {id, parentId} = req.body;
+        if (id === parentId)
+            return next(ApiError.badRequest('Нарушение логики структуры!'));
         await Crud.update(req, res, next, tblDictEnterprise);
     }
 
