@@ -28,12 +28,34 @@ const tblUser = sequelize.define('tblUser', {
             notEmpty: {args: true, msg: 'поле "пароль" содержит пустое значение'} // не дупускает пустых псоледовательностей
         }
     },
-    role: {
-        type: DataTypes.STRING, allowNull: false, validate: {
-            notNull: {args: true, msg: 'поле "роль" не может быть пустым'},  // не допусает значение NULL
-            notEmpty: {args: true, msg: 'поле "роль" содержит пустое значение'} // не дупускает пустых псоледовательностей
+    // role: {
+    //     type: DataTypes.STRING, allowNull: false, validate: {
+    //         notNull: {args: true, msg: 'поле "роль" не может быть пустым'},  // не допусает значение NULL
+    //         notEmpty: {args: true, msg: 'поле "роль" содержит пустое значение'} // не дупускает пустых псоледовательностей
+    //     }
+    // },
+    isAdmin: {
+        type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false, validate: {
+            notNull: {args: true, msg: 'не может быть пустым'},  // не допусает значение NULL
         }
-    }
+
+    },
+    canInsert: {
+        type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false, validate: {
+            notNull: {args: true, msg: 'не может быть пустым'},  // не допусает значение NULL
+        }
+
+    },
+    canUpdate: {
+        type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false, validate: {
+            notNull: {args: true, msg: 'не может быть пустым'},  // не допусает значение NULL
+        }
+    },
+    canDelete: {
+        type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false, validate: {
+            notNull: {args: true, msg: 'не может быть пустым'},  // не допусает значение NULL
+        }
+    },
 })
 
 // 1. модель лицо
@@ -139,7 +161,9 @@ const tblFacePhoto = sequelize.define('tblFacePhoto', {
         allowNull: false,
         validate: {notNull: {args: true, msg: 'поле "дата" не может быть пустым'}}
     },
-    pathFile: {type: DataTypes.STRING, allowNull: false, unique: true, validate: {unique: true}},
+    pathFile: {
+        type: DataTypes.STRING, allowNull: false, unique: true//, validate: {unique: true}
+    },
 }, {
     indexes: [
         {unique: false, fields: ['tblFaceId']} // индекс по внешнему ключу для оптимизатора запросов СУБД
@@ -344,6 +368,7 @@ const tblOrder = sequelize.define('tblOrder', {
         }
     },
     text: {type: DataTypes.TEXT},
+    pathFile: {type: DataTypes.STRING}
 
 })
 
@@ -454,6 +479,23 @@ const tblFaceAspirant = sequelize.define('tblFaceAspirant', {
     ]
 });
 
+// таблица, содержащая аспирантов в академе
+const tblFaceAspirantAcadem = sequelize.define('tblFaceAspirantAcadem', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    tblFaceId: {type: DataTypes.INTEGER},
+    dateOn: {
+        type: DataTypes.DATEONLY, allowNull: false, validate: {
+            notNull: {args: true, msg: 'поле не может быть пустым'},  // не допусает значение NULL
+        }
+    },
+    dateOff: {type: DataTypes.DATEONLY,},
+    note: {type: DataTypes.STRING}
+}, {
+    indexes: [
+        {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+    ]
+});
+
 // 17. промежуточная таблица для формирорвания многий-ко-многим лица в приказах
 const tblFace_tblOrder = sequelize.define('tblFace_tblOrder', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -471,6 +513,13 @@ const tblFace_tblOrder = sequelize.define('tblFace_tblOrder', {
             key: 'id'
         }
     },
+    tblFaceAspirantAcademId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: tblFaceAspirantAcadem,
+            key: 'id'
+        }
+    },
     // tblFaceAspirantId: {
     //     type: DataTypes.INTEGER,
     //     //allowNull: false,
@@ -484,9 +533,9 @@ const tblFace_tblOrder = sequelize.define('tblFace_tblOrder', {
         allowNull: false,
         defaultValue: 'in',
         validate: {
-            notNull: {args: true, msg: 'необходимо указать какого типа узел'},  // не допусает значение NULL
-            notEmpty: {args: true, msg: 'необходимо указать какого типа узел'}, // не дупускает пустых псоледовательностей
-            isIn: [['in', 'out', 'reIn']] // зачислен, отчислен, перевод
+            notNull: {args: true, msg: 'необходимо тип отношения'},  // не допусает значение NULL
+            notEmpty: {args: true, msg: 'необходимо тип отношения'}, // не дупускает пустых псоледовательностей
+            isIn: [['in', 'out', 'reIn' , 'academ-on', 'academ-off']] // зачислен, отчислен, перевод
         },
     },
     note: {type: DataTypes.STRING}
@@ -495,6 +544,7 @@ const tblFace_tblOrder = sequelize.define('tblFace_tblOrder', {
     indexes: [
         {unique: false, fields: ['tblFaceId']}, // индекс по полю
         {unique: false, fields: ['tblOrderId']}, // индекс по полю
+        {unique: false, fields: ['tblFaceAspirantAcademId']}, // индекс по полю
         // {unique: false, fields: ['tblFaceAspirantId']} // индекс по полю
     ]
 })
@@ -662,8 +712,14 @@ tblFace_tblOrder.belongsTo(tblFace, {foreignKey: {allowNull: false}}/*чтобы
 tblOrder.hasMany(tblFace_tblOrder, {foreignKey: {allowNull: false}});
 tblFace_tblOrder.belongsTo(tblOrder, {foreignKey: {allowNull: false}}/*чтобы не допускать пустого ключа*/);
 
-tblFaceAspirant.hasMany(tblFace_tblOrder);
-tblFace_tblOrder.belongsTo(tblFaceAspirant);
+tblFaceAspirant.hasMany(tblFace_tblOrder, {onDelete: 'NO ACTION'});
+tblFace_tblOrder.belongsTo(tblFaceAspirant, {onDelete: 'NO ACTION'});
+
+tblFaceAspirantAcadem.belongsToMany(tblOrder, {through: tblFace_tblOrder /*табл. связующая*/});
+tblOrder.belongsToMany(tblFaceAspirantAcadem, {through: tblFace_tblOrder});
+
+tblFaceAspirantAcadem.hasMany(tblFace_tblOrder);
+tblFace_tblOrder.belongsTo(tblFaceAspirantAcadem);
 
 // tblFaceAspirant.belongsToMany(tblOrder, {through: tblFaceAspirant_tblOrder /*табл. связующая*/});
 // tblOrder.belongsToMany(tblFaceAspirant, {through: tblFaceAspirant_tblOrder});
@@ -720,7 +776,7 @@ tblFaceDocument.belongsTo(tblDictDoc, {foreignKey: {allowNull: false}});
 tblFace.hasMany(tblFaceEducation, {foreignKey: {allowNull: false}});
 tblFaceEducation.belongsTo(tblFace, {foreignKey: {allowNull: false}});
 
-tblDictEducationLevel.hasMany(tblFaceEducation), {foreignKey: {allowNull: false}};
+tblDictEducationLevel.hasMany(tblFaceEducation, {foreignKey: {allowNull: false}});
 tblFaceEducation.belongsTo(tblDictEducationLevel, {foreignKey: {allowNull: false}});
 
 tblFace.hasMany(tblFaceWork, {foreignKey: {allowNull: false}});
@@ -834,7 +890,8 @@ module.exports = {
     tblDictCertificationResult,
     tblFaceBusinessTrip,
     tblFaceExaminations,
-    tblUser
+    tblUser,
+    tblFaceAspirantAcadem
 }
 
 
