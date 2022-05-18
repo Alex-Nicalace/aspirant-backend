@@ -20,6 +20,11 @@ app.use('/api', router);
 // обработка ошибок, последний Middleware
 app.use(errorHandler); // мидл кот. работает с ошибками должен регистрироваться в самом конце
 
+// должно быть последним
+app.use('/', express.static(path.join(__dirname,'build')))
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'build', 'index.html'))
+})
 
 // описание функции для подключения к базе данных
 const start = async () => {
