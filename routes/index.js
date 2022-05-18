@@ -34,45 +34,48 @@ const faceBusinessTripRouter = require('./faceBusinessTripRouter');
 const faceExaminationsRouter = require('./faceExaminationsRouter');
 const dictDirectionRouter = require('./dictDirectionRouter');
 const dictDirectionalityAndSpecialtyRouter = require('./dictDirectionalityAndSpecialtyRouter');
+const faceAspirantAcademRouter = require('./faceAspirantAcademRouter');
+const authMiddleware = require('../middleware/authMiddleware');
 
 // в основном роутере необходимо указать подроутеры
 // первый параметр URL по которому роутер будет отрабатывать
 // 2 параметр сам роутер
 router.use('/user', userRouter);
 
-router.use('/face', faceRouter);
-router.use('/face-name', faceNameRouter);
-router.use('/face-document', faceDocumentRouter);
-router.use('/face-citizenship', faceCitizenshipRouter);
-router.use('/face-photo', facePhotoRouter);
-router.use('/face-education', faceEducationRouter);
-router.use('/face-work', faceWorkRouter);
-router.use('/face-residence', faceResidenceRouter);
-router.use('/face-contact', faceContactsRouter);
-router.use('/face-order', faceOrderRouter);
-router.use('/face-entrance-examin', faceEntranceExaminRouter);
-router.use('/face-aspirant', faceAspirantRouter);
-router.use('/face-academic-advisor', academicAdvisorRouter);
-router.use('/face-scientific-publ', faceScientificPublicationsRouter);
-router.use('/face-certification-result', faceCertificationResultRouter);
-router.use('/face-business-trip', faceBusinessTripRouter);
-router.use('/face-examinations', faceExaminationsRouter);
+router.use('/face', authMiddleware, faceRouter);
+router.use('/face-name', authMiddleware, faceNameRouter);
+router.use('/face-document', authMiddleware, faceDocumentRouter);
+router.use('/face-citizenship', authMiddleware, faceCitizenshipRouter);
+router.use('/face-photo', authMiddleware, facePhotoRouter);
+router.use('/face-education', authMiddleware, faceEducationRouter);
+router.use('/face-work', authMiddleware, faceWorkRouter);
+router.use('/face-residence', authMiddleware, faceResidenceRouter);
+router.use('/face-contact', authMiddleware, faceContactsRouter);
+router.use('/face-order', authMiddleware, faceOrderRouter);
+router.use('/face-entrance-examin', authMiddleware, faceEntranceExaminRouter);
+router.use('/face-aspirant', authMiddleware, faceAspirantRouter);
+router.use('/face-aspirant-academ', authMiddleware, faceAspirantAcademRouter);
+router.use('/face-academic-advisor', authMiddleware, academicAdvisorRouter);
+router.use('/face-scientific-publ', authMiddleware, faceScientificPublicationsRouter);
+router.use('/face-certification-result', authMiddleware, faceCertificationResultRouter);
+router.use('/face-business-trip', authMiddleware, faceBusinessTripRouter);
+router.use('/face-examinations', authMiddleware, faceExaminationsRouter);
 
-router.use('/order', orderRouter);
+router.use('/order', authMiddleware, orderRouter);
 
-router.use('/dict-doc', dictDocRouter);
-router.use('/dict-country', dictCountryRouter);
-router.use('/dict-education-level', dictEducationLevelRouter);
-router.use('/dict-city', dictCityRouter );
-router.use('/dict-street', dictStreetRouter );
-router.use('/dict-contact-type', dictContactTypeRouter );
-router.use('/dict-enterprise', dictEnterpriseRouter );
-router.use('/dict-enterprise-as-tree', dictEnterpriseAsTreeRouter );
-router.use('/dict-subject', dictSubjectRouter);
-router.use('/dict-education-form', dictEducationFormRouter);
-router.use('/dict-certification-result', dictCertificationResultRouter);
-router.use('/dict-direction', dictDirectionRouter);
-router.use('/dict-directionality-and-specialty', dictDirectionalityAndSpecialtyRouter);
+router.use('/dict-doc', authMiddleware, dictDocRouter);
+router.use('/dict-country', authMiddleware, dictCountryRouter);
+router.use('/dict-education-level', authMiddleware, dictEducationLevelRouter);
+router.use('/dict-city', authMiddleware,  dictCityRouter );
+router.use('/dict-street', authMiddleware, dictStreetRouter );
+router.use('/dict-contact-type', authMiddleware, dictContactTypeRouter );
+router.use('/dict-enterprise', authMiddleware, dictEnterpriseRouter );
+router.use('/dict-enterprise-as-tree', authMiddleware, dictEnterpriseAsTreeRouter );
+router.use('/dict-subject', authMiddleware, dictSubjectRouter);
+router.use('/dict-education-form', authMiddleware, dictEducationFormRouter);
+router.use('/dict-certification-result', authMiddleware, dictCertificationResultRouter);
+router.use('/dict-direction', authMiddleware, dictDirectionRouter);
+router.use('/dict-directionality-and-specialty', authMiddleware, dictDirectionalityAndSpecialtyRouter);
 
 
 module.exports = router;
