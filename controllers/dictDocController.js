@@ -1,6 +1,5 @@
-const ApiError = require("../error/ApiError");
 const {tblDictDoc} = require("../models/models");
-const  Crud  = require('./Crud');
+const Crud = require('./Crud');
 
 
 // можно обойтись без класса создавая просто ф-ции, но

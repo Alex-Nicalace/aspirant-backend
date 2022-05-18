@@ -2,17 +2,11 @@
 const {tblDictEnterprise} = require('../models/models');
 const ApiError = require('../error/ApiError');
 const Crud = require('./Crud');
-const {Sequelize} = require("sequelize");
 
 // можно обойтись без класса создавая просто ф-ции, но
 // классы группируют
 class dictEnterpriseController {
     async create(req, res, next) {
-        //const rec = await model.create({...req.body});
-        const {id, parentId} = req.body;
-        if (id === parentId)
-            return next(ApiError.badRequest('Нарушение логики структуры!'));
-        // typeof(parentId) !== 'number' && (req.body.parentId = null)
         await Crud.create(req, res, next, tblDictEnterprise);
     }
 
@@ -31,6 +25,33 @@ class dictEnterpriseController {
         await Crud.getAll(req, res, next, tblDictEnterprise);
     }
 
+    getFullName = async(id, str = null) => {
+        //let result = '';
+        const t = await tblDictEnterprise.findByPk(id);
+        const patentId = t.parentId;
+        const result =  (str ? str + ', ' : '')   + t.name
+        if (patentId) {
+            return await this.getFullName(patentId, result)
+        }
+        return result
+    }
+
+    getAllWithJoinedName = async (req, res, next) => {
+        try {
+            const recordset = await Crud.getAll(req, null, next, tblDictEnterprise);
+            // const jsonString = JSON.stringify(recordset);
+            // const obj = JSON.parse(jsonString);
+            const recordsetMod = await Promise.all(recordset.map(async (i) => {
+                const joinedName = await this.getFullName(i.dataValues.id)
+                return {...i.dataValues, joinedName}
+            }))
+            //console.log(tst);
+            return res.json(recordsetMod);
+        } catch (e) {
+            next(ApiError.badRequest(e.message))
+        }
+    }
+
     getBranch = async (id) => {
         const res = (await tblDictEnterprise.findAll({
             where: {
@@ -44,17 +65,6 @@ class dictEnterpriseController {
             m.push({...res[i].dataValues, children})
         }
         return m
-    }
-
-    getFullName = async(id, str = null) => {
-        //let result = '';
-        const t = await tblDictEnterprise.findByPk(id);
-        const patentId = t.parentId;
-        const result =  (str ? str + ', ' : '')   + t.name
-        if (patentId) {
-            return await this.getFullName(patentId, result)
-        }
-        return result
     }
 
     getTreeBranch = async (req, res, next) => { // если неьбходимо выести указанную ветку

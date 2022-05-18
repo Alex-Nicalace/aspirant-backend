@@ -9,7 +9,7 @@ const {Op} = require("sequelize");
 // классы группируют
 class Controller {
     getOnParams = async (params) => {
-        const fn = dictEnterpriseController.getFullName;
+        //const fn = dictEnterpriseController.getFullName;
         return await tblDictDirectionalityAndSpecialty.findAll({
             attributes: {
                 include: [
@@ -65,12 +65,15 @@ class Controller {
     }
 
     getAll = async (req, res, next) => {
-        //await Crud.getAll(req, res, next, tblDictDirectionalityAndSpecialty, [['DirectionalityOrSpecialty', 'ASC']]);
         try {
+            const fn = dictEnterpriseController.getFullName;
             const recordset = await this.getOnParams()
-            //recordset.model.dataValues = recordset.model.dataValues.map(i => ({...i, fullName: dictEnterpriseController.getFullName(i.tblDictEnterpriseId)}))
-            //const t = recordset.t map(async i => ({...i, fullName: await dictEnterpriseController.getFullName(i.tblDictEnterpriseId)}))
-            return res.json(recordset);
+            const recordsetMod = await Promise.all(recordset.map(async (i) => {
+                const joinedName = await fn(i.dataValues.tblDictEnterpriseId )
+                return {...i.dataValues, joinedName}
+            }))
+            //console.log(tst);
+            return res.json(recordsetMod);
         } catch (e) {
             next(ApiError.badRequest(e.message));
         }

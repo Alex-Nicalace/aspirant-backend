@@ -1,11 +1,9 @@
-const {tblFace, tblFaceName} = require('../models/models');
+const {tblFace, tblFaceName, tblAcademicAdvisor, tblFaceAspirant, tblFacePhoto} = require('../models/models');
 const ApiError = require('../error/ApiError');
 const {Op} = require("sequelize");
 const {Sequelize} = require("sequelize");
 const Crud = require('./Crud');
-const {tblAcademicAdvisor} = require("../models/models");
-const {tblFaceAspirant} = require("../models/models");
-const {takeValuesFromField} = require("../utils/utils");
+const {stringToBoolean} = require("../utils/utils");
 
 // можно обойтись без класса создавая просто ф-ции, но
 // классы группируют
@@ -30,7 +28,7 @@ class FaceController {
                 },
                 {
                     attributes: [
-                        'dateOn','dateOff',
+                        'dateOn', 'dateOff',
                     ],
                     model: tblFaceAspirant,
                     order: [['dateOn', 'DESC']], // сортировка по убыванию, чтобы показать последнюю ФИО
@@ -38,6 +36,12 @@ class FaceController {
                 },
                 {
                     model: tblAcademicAdvisor,
+                },
+                {
+                    model: tblFacePhoto,
+                    order: [['dateOn', 'DESC']],
+                    limit: 1,
+                    attributes: ['pathFile']
                 }
             ]
         })
@@ -134,7 +138,7 @@ class FaceController {
         try {
             const dataset = await this.getOnParams({id: updateRec.id});
             return res.json(dataset[0]);
-        }catch (e) {
+        } catch (e) {
             next(ApiError.badRequest(e.message))
         }
     }
@@ -162,6 +166,61 @@ class FaceController {
         } catch (e) {
             next(ApiError.badRequest(e.message));
         }
+    }
+
+    getByParams = async (req, res, next) => {
+        const {lastname, firstname, middleName, dd, mm, yyyy, sex} = req.query;
+        const paramsForFace = {};
+        paramsForFace[Op.and] = [];
+        if (sex)
+            paramsForFace[Op.and].push({sex: stringToBoolean(sex)})
+        if (yyyy)
+            paramsForFace[Op.and].push(Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('birthdate')), yyyy));
+        if (mm)
+            paramsForFace[Op.and].push(Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('birthdate')), mm));
+        if (dd)
+            paramsForFace[Op.and].push(Sequelize.where(Sequelize.fn('DAY', Sequelize.col('birthdate')), dd));
+
+        const paramsForFaceName = {};
+        if (lastname)
+            paramsForFaceName.lastname = {[Op.like]: `${lastname}%`}
+        if (firstname)
+            paramsForFaceName.firstname = {[Op.like]: `${firstname}%`}
+        if (middleName)
+            paramsForFaceName.middleName = {[Op.like]: `${middleName}%`}
+
+        const buildWhere = (recordset) => {
+            let result = [];
+
+            recordset.forEach(i => {
+                result.push({[Op.and]: [{id: i.id}]})
+            });
+            return {
+                [Op.or]: result
+            }
+        }
+
+        try {
+            const recordset = await tblFace.findAll({
+                where: paramsForFace,
+                include: [
+                    {
+                        attributes: [],
+                        model: tblFaceName,
+                        required: true,
+                        where: paramsForFaceName
+                    },
+                ]
+            })
+            //return res.json(recordset);
+            const params = buildWhere(recordset);
+            const recordset2 = await this.getOnParams(params);
+            return res.json(recordset2);
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
+
+
     }
 
     /*    async getAll(req, res) {

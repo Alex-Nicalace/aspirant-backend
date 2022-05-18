@@ -16,7 +16,11 @@ class Crud {
         if (!rec)
             next(ApiError.badRequest('record not found'));
         //Object.keys(req.body).filter(i => i !== )
-        for (let key in req.body)
+        // for (let key in req.body)
+        //     if (req.body.hasOwnProperty(key)) // условие чтобы не перебирать свойство прототипа объекта
+        //         rec[key] = req.body[key]
+
+        for (let key in rec.dataValues)
             if (req.body.hasOwnProperty(key)) // условие чтобы не перебирать свойство прототипа объекта
                 rec[key] = req.body[key]
 
@@ -62,7 +66,8 @@ class Crud {
             const recordset = await model.findAll({
                 order: order
             });
-            return res.json(recordset);
+            return res ? res.json(recordset) : recordset;
+            //return res.json(recordset);
         } catch (e) {
             next(ApiError.badRequest(e.message))
         }
@@ -76,7 +81,7 @@ class Crud {
         try {
             await rec.destroy();
             //res.json({message: 'record deleted'})
-            res.json(rec);
+            return res ? res.json(rec) : rec;
         } catch (e) {
             next(ApiError.badRequest(e.message));
         }

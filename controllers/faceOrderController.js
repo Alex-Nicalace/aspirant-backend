@@ -1,8 +1,6 @@
-const {tblFace_tblOrder, tblOrder, tblFace} = require('../models/models');
+const {tblFace_tblOrder, tblOrder, tblFace, tblFaceAspirantAcadem, tblFaceAspirant, tblFaceName, } = require('../models/models');
 const ApiError = require('../error/ApiError');
 const Crud = require('./Crud');
-const {tblFaceAspirant} = require("../models/models");
-const {tblFaceName} = require("../models/models");
 const {Sequelize} = require("sequelize");
 
 // можно обойтись без класса создавая просто ф-ции, но
@@ -44,9 +42,17 @@ class Controller {
                             model: tblFaceName,
                             order: [['dateOn', 'DESC']], // сортировка по убыванию, чтобы показать последнюю ФИО
                             limit: 1, // взять у сортированного списка первую запись
-                        }
+                        },
                     ]
                 },
+                {
+                    model: tblFaceAspirant,
+                    attributes: ['dateOn', 'dateOff']
+                },
+                {
+                    model: tblFaceAspirantAcadem,
+                    attributes: ['dateOn', 'dateOff', 'note']
+                }
             ],
             //order: [['date', 'ASC']],
         });
@@ -85,7 +91,7 @@ class Controller {
 
     create = async (req, res, next) => {
         try {
-            const {tblFaceAspirantId} = req.body;
+            const {tblFaceAspirantId, tblFaceAspirantAcademId} = req.body;
             const values = {};
             if (tblFaceAspirantId) {
                const {tblFaceId} = await tblFaceAspirant.findByPk(tblFaceAspirantId);
@@ -93,6 +99,13 @@ class Controller {
                    return next(ApiError.badRequest('не удалось найти лицо'))
                }
                values.tblFaceId = tblFaceId;
+            }
+            if (tblFaceAspirantAcademId) {
+                const {tblFaceId} = await tblFaceAspirantAcadem.findByPk(tblFaceAspirantAcademId);
+                if (!tblFaceId) {
+                    return next(ApiError.badRequest('не удалось найти лицо'))
+                }
+                values.tblFaceId = tblFaceId;
             }
             const recCreated = await tblFace_tblOrder.create({...req.body, ...values});
             //const recCreated = await Crud.create(req, null, next, tblFace_tblOrder);

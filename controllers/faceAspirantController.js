@@ -14,6 +14,8 @@ const {
 const ApiError = require('../error/ApiError');
 const {Sequelize} = require("sequelize");
 const Crud = require('./Crud');
+const {isEmptyObj} = require("../utils/utils");
+const {stringToBoolean} = require("../utils/utils");
 const {Op} = require("sequelize");
 //const {takeValuesFromField} = require("../utils/utils");
 
@@ -44,7 +46,10 @@ class faceAspirantController {
         }
     }
 
-    getOnParams = async (params) => {
+    getOnParams = async (params, paramsTblFace = {},
+                         paramsTblDictNameDirection = {},
+                         paramsTblDictEnterprise = {},
+                         paramsTblDictEnterprise2 = {}) => {
         return await tblFaceAspirant.findAll({
             where: params,
             include: [ // это типа соединение JOIN как в SQL
@@ -68,12 +73,22 @@ class faceAspirantController {
                         {
                             model: tblDictNameDirection,
                             attributes: ['nameDirection'],
-                            //required: true,
+                            required: !isEmptyObj(paramsTblDictNameDirection),
+                            where: paramsTblDictNameDirection
                         },
                         {
                             model: tblDictEnterprise,
-                            attributes: ['name'],
+                            where: paramsTblDictEnterprise,
+                            attributes: ['id', 'name', 'whatIsIt', 'parentId'],
                             required: true,
+                            include: [
+                                {
+                                    model: tblDictEnterprise,
+                                    where: paramsTblDictEnterprise2,
+                                    required: true,
+                                    attributes: ['id', 'name', 'whatIsIt', 'parentId']
+                                }
+                            ]
                         }
                     ]
                 },
@@ -111,8 +126,10 @@ class faceAspirantController {
                         }
                     ]
                 },
+                // аспирант - лицо
                 {
                     model: tblFace,
+                    where: paramsTblFace,
                     required: true, // преобразовывая запрос из значения OUTER JOINпо умолчанию в запрос INNER JOIN
                     include: [
                         {
@@ -172,9 +189,22 @@ class faceAspirantController {
     }
 
     getAllOneFace = async (req, res, next) => {
-        const {faceId: tblFaceId} = req.params;
+        const {faceId} = req.params;
+        const tblFaceId = isNaN(faceId) ? null : faceId
         try {
             const recordset = await this.getOnParams({tblFaceId})
+            return res.json(recordset);
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
+
+    }
+
+    getAllOneAdvisor = async (req, res, next) => {
+        const {advisorId} = req.params;
+        const tblAcademicAdvisorId = isNaN(advisorId) ? null : advisorId
+        try {
+            const recordset = await this.getOnParams({tblAcademicAdvisorId})
             return res.json(recordset);
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -190,6 +220,172 @@ class faceAspirantController {
         } catch (e) {
             next(ApiError.badRequest(e.message));
         }
+
+    }
+
+    getByParams = async (req, res, next) => {
+        const {
+            lastname,
+            firstname,
+            middleName,
+            dd,
+            mm,
+            yyyy,
+            sex,
+            isRecommendation,
+            isProtocol,
+            isAgree,
+            isHeadDepartment,
+            ddIn,
+            mmIn,
+            yyyyIn,
+            ddOut,
+            mmOut,
+            yyyyOut,
+            dissertationTheme,
+            tblDictEducationFormId,
+            tblDictNameDirectionId,
+            status,
+            tblDictDirectionalityAndSpecialtyId,
+            facultyId,
+            departmentId,
+            tblDictSubjectId,
+            tblAcademicAdvisorId,
+        } = req.query;
+
+        const paramsTblDictEnterprise = {};
+        paramsTblDictEnterprise[Op.and] = [];
+        if (departmentId)
+            paramsTblDictEnterprise[Op.and].push({id: departmentId});
+
+        const paramsTblDictEnterprise2 = {};
+        paramsTblDictEnterprise2[Op.and] = [];
+        if (facultyId)
+            paramsTblDictEnterprise2[Op.and].push({id: facultyId});
+
+        const paramsForFace = {};
+        paramsForFace[Op.and] = [];
+        if (sex)
+            paramsForFace[Op.and].push({sex: stringToBoolean(sex)})
+        if (yyyy)
+            paramsForFace[Op.and].push(Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('birthdate')), yyyy));
+        if (mm)
+            paramsForFace[Op.and].push(Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('birthdate')), mm));
+        if (dd)
+            paramsForFace[Op.and].push(Sequelize.where(Sequelize.fn('DAY', Sequelize.col('birthdate')), dd));
+
+        const paramsForFaceName = {};
+        if (lastname)
+            paramsForFaceName.lastname = {[Op.like]: `${lastname}%`}
+        if (firstname)
+            paramsForFaceName.firstname = {[Op.like]: `${firstname}%`}
+        if (middleName)
+            paramsForFaceName.middleName = {[Op.like]: `${middleName}%`}
+
+        const buildWhere = (recordset) => {
+            let result = [];
+
+            recordset.forEach(i => {
+                result.push({[Op.and]: [{id: i.id}]})
+            });
+            return {
+                [Op.or]: result
+            }
+        }
+
+        try {
+            const recordset = await tblFace.findAll({
+                where: paramsForFace,
+                include: [
+                    {
+                        attributes: [],
+                        model: tblFaceName,
+                        required: true,
+                        where: paramsForFaceName
+                    },
+                ]
+            })
+            //return res.json(recordset);
+            const paramsTblFace = buildWhere(recordset);
+            const paramsFaceAspirant = {};
+            paramsFaceAspirant[Op.and] = [];
+            if (isRecommendation)
+                paramsFaceAspirant[Op.and].push({isRecommendation: stringToBoolean(isRecommendation)})
+            if (isProtocol)
+                paramsFaceAspirant[Op.and].push({isProtocol: stringToBoolean(isProtocol)})
+            if (isAgree)
+                paramsFaceAspirant[Op.and].push({isAgree: stringToBoolean(isAgree)})
+            if (isHeadDepartment)
+                paramsFaceAspirant[Op.and].push({isRecommendation: stringToBoolean(isHeadDepartment)})
+
+            if (yyyyIn)
+                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('dateOn')), yyyyIn));
+            if (mmIn)
+                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('dateOn')), mmIn));
+            if (ddIn)
+                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.fn('DAY', Sequelize.col('dateOn')), ddIn));
+
+            if (yyyyOut)
+                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('dateOff')), yyyyOut));
+            if (mmOut)
+                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('dateOff')), mmOut));
+            if (ddOut)
+                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.fn('DAY', Sequelize.col('dateOff')), ddOut));
+
+            if (dissertationTheme)
+                paramsFaceAspirant[Op.and].push({dissertationTheme: {[Op.like]: `${dissertationTheme}%`}})
+
+            if (tblDictEducationFormId)
+                paramsFaceAspirant[Op.and].push({tblDictEducationFormId});
+
+            if (tblDictDirectionalityAndSpecialtyId)
+                paramsFaceAspirant[Op.and].push({tblDictDirectionalityAndSpecialtyId});
+
+            if (tblDictSubjectId)
+                paramsFaceAspirant[Op.and].push({tblDictSubjectId});
+
+            if (tblAcademicAdvisorId)
+                paramsFaceAspirant[Op.and].push({tblAcademicAdvisorId});
+            //paramsFaceAspirant[Op.and].push(await this.buildConditionLastRecords()); // последние записи в аспиранте выбирать. подумал вдруг можно быть аспирантов в двух местах поэтому закоментил
+            // свитч решает каких показывать действующих , исключенных или всех
+            switch (status) {
+                case 'active':
+                    paramsFaceAspirant[Op.and].push({
+                        dateOff: {
+                            [Op.or]: {
+                                [Op.is]: null,
+                                [Op.gte]: new Date()
+                            }
+                        }
+                    });
+                    break;
+                case 'deleted':
+                    paramsFaceAspirant[Op.and].push(
+                        {
+                            dateOff: {
+                                [Op.lt]: new Date()
+                            }
+                        });
+                    break;
+                default:
+                    break;
+            }
+
+            const paramsDictNameDirection = {};
+            if (tblDictNameDirectionId)
+                paramsDictNameDirection.id = tblDictNameDirectionId;
+
+            const recordset2 = await this.getOnParams(
+                paramsFaceAspirant,
+                paramsTblFace,
+                paramsDictNameDirection,
+                paramsTblDictEnterprise,
+                paramsTblDictEnterprise2);
+            return res.json(recordset2);
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
+
 
     }
 
