@@ -1,7 +1,6 @@
-require('dotenv').config(); // позволяет использовать файл переменных окружения
+require('dotenv').config({ path: process.env.NODE_ENV === 'production' ? '.env' : '.env.local' }); // позволяет использовать файл переменных окружения
 const express = require('express'); //импорт фрейммворка
 const sequelize = require('./db'); // импорт конфигурации БД
-//const models = require('./models/models'); // импорт созданных моделей (ORM)
 const cors = require('cors'); // импорт функции cors из пакета cors
 const fileUpload = require('express-fileupload'); //для работы с файлами
 const router = require('./routes'); // импорт основного роутера
@@ -9,7 +8,6 @@ const errorHandler = require('./middleware/ErrorHandlerMiddleware'); // мидл
 const path = require('path'); //  утилиты для работы с путями к файлам и каталогам
 
 const PORT = process.env.PORT || 8080;
-//необходимо указать серверу, что файлы из папки static необходмио раздавать как статику
 const app = express();
 app.use(cors()); // настройка cors для возможности отправлять запросы с браузера
 app.use(express.json()) // чтобы приложение могло парсить json
@@ -21,9 +19,9 @@ app.use('/api', router);
 app.use(errorHandler); // мидл кот. работает с ошибками должен регистрироваться в самом конце
 
 // должно быть последним
-app.use('/', express.static(path.join(__dirname,'build')))
+app.use('/', express.static(path.join(__dirname,'client/build')))
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'build', 'index.html'))
+    res.sendFile(path.resolve(__dirname, 'client/build', 'index.html'))
 })
 
 // описание функции для подключения к базе данных
@@ -43,6 +41,7 @@ const start = async () => {
 
         app.listen(PORT, () => console.log(`Server started on port http://localhost:${PORT}`));
     } catch (e) {
+        console.log(e.message)
 
     }
 }
