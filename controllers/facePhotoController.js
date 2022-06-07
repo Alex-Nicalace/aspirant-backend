@@ -20,14 +20,21 @@ class facePhotoController {
         try {
             const {dateOn, tblFaceId} = req.body;// т.к. это post запрос то у него body
             const {file} = req.files; // получаю файл из тела запроса
-            let fileName = uuid.v4() + '.jpg'; // необходимо сгенерить уникальное имя
-            await file.mv(
-                path.resolve( //path.resolve - адаптирует указанный путь к ОС
-                    __dirname, // __dirname - путь до текущей папки с контроллерами
-                    '..', // .. - вернцться на директории выше
-                    'static', // место куда переместить файл
-                    fileName // новое имя файла
-                ))
+            const fileName = uuid.v4() + '.jpg'; // необходимо сгенерить уникальное имя
+            const pathRoot = path.resolve(__dirname, '..'); //path.resolve - адаптирует указанный путь к ОС, // __dirname - путь до текущей папки с контроллерами
+            const pathPhoto = path.resolve(pathRoot, 'static')
+            if (!fs.existsSync(pathPhoto)) {
+                fs.mkdirSync(pathPhoto)
+            }
+            const pathFile = path.resolve(
+                pathPhoto,
+                fileName // новое имя файла
+            )
+            await file.mv(pathFile, err => {
+                if (err) {
+                    return next(ApiError.internal('не удалось сохранить файл'))
+                }
+            })
             const rec = await tblFacePhoto.create({dateOn, pathFile: fileName, tblFaceId});
             return res.json(rec);
         } catch (e){
@@ -81,8 +88,11 @@ class facePhotoController {
             recDeleted.pathFile // новое имя файла
         );
 
-        fs.unlinkSync(pathFile);
+        try {
+            fs.unlinkSync(pathFile);
+        }catch (e) {
 
+        }
         res.json({message: 'record deleted'})
     }
 

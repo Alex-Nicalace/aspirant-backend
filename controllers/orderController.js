@@ -28,11 +28,12 @@ class Controller {
                 const fileName = `${dateToFormatISO(dateOrder)}_№_${numOrder}`
                 const fileExt = file.name.split('.').pop();
                 newFileName = fileName + '.' + fileExt;
+                const pathOrders = path.resolve(__dirname, '..', 'static', 'orders')
+                if (!fs.existsSync(pathOrders)) {
+                    fs.mkdirSync(pathOrders, { recursive: true })
+                }
                 await file.mv(
-                    path.resolve( //path.resolve - адаптирует указанный путь к ОС
-                        __dirname, // __dirname - путь до текущей папки с контроллерами
-                        '..', // .. - вернцться на директории выше
-                        'static/orders', // место куда переместить файл
+                    path.resolve( pathOrders, // место куда переместить файл
                         newFileName // имя файла на клиенте
                     ), err => {
                         if (err) {
@@ -40,10 +41,10 @@ class Controller {
                         }
                     });
             }
-            if (newFileName)
-                newFileName = 'orders/' + newFileName;
 
-            const rec = await tblOrder.create({numOrder, dateOrder, text, pathFile: newFileName});
+            const pathFile = newFileName ? `/orders/${newFileName}` : null
+
+            const rec = await tblOrder.create({numOrder, dateOrder, text, pathFile});
 
             return res.json(rec);
         } catch (e) {
@@ -52,6 +53,10 @@ class Controller {
     }
 
     async update(req, res, next) {
+        const pathOrders = path.resolve(__dirname, '..', 'static', 'orders')
+        if (!fs.existsSync(pathOrders)) {
+            fs.mkdirSync(pathOrders, { recursive: true })
+        }
         let transaction;
         try {
             // открыть транзакцию
@@ -80,7 +85,7 @@ class Controller {
 
             const newRecord = {numOrder, dateOrder, text};
             if (fileName) {
-                newRecord.pathFile = `orders/${fileName}`;
+                newRecord.pathFile = `/orders/${fileName}`;
             }
             if (isDeleteFile === true) {
                 // если есть признак удалить файл то чистить полея ссылки на файл
@@ -94,7 +99,7 @@ class Controller {
                     const pathFile = path.resolve( //path.resolve - адаптирует указанный путь к ОС
                         __dirname, // __dirname - путь до текущей папки с контроллерами
                         '..', // .. - вернцться на директории выше
-                        'static/', // место куда переместить файл
+                        'static', // место куда переместить файл
                         rec.pathFile // новое имя файла
                     );
                     await fs.access(pathFile, fs.F_OK, (err) => {
@@ -110,7 +115,7 @@ class Controller {
                     const pathFile = path.resolve( //path.resolve - адаптирует указанный путь к ОС
                         __dirname, // __dirname - путь до текущей папки с контроллерами
                         '..', // .. - вернцться на директории выше
-                        'static/', // место куда переместить файл
+                        'static', // место куда переместить файл
                         rec.pathFile // новое имя файла
                     );
                     await fs.access(pathFile, fs.F_OK, (err) => {
@@ -121,10 +126,7 @@ class Controller {
                     })
                 }
                 await file.mv(
-                    path.resolve( //path.resolve - адаптирует указанный путь к ОС
-                        __dirname, // __dirname - путь до текущей папки с контроллерами
-                        '..', // .. - вернцться на директории выше
-                        'static/orders', // место куда переместить файл
+                    path.resolve(pathOrders, // место куда переместить файл
                         fileName // имя файла на клиенте
                     ), err => {
                         if (err) {
@@ -135,7 +137,7 @@ class Controller {
                 //newFileName = `${fileName}.${rec.pathFile.split('.').pop()}`
                 fs.rename(
                     path.resolve(__dirname, '..', 'static', rec.pathFile),
-                    path.resolve(__dirname, '..', `static/orders/${fileName}`),
+                    path.resolve(pathOrders, fileName),
                     (err) => {
                         if (err)
                             return next(ApiError.badRequest('не удалось переименовать файл приказа согласно реквизитам приказа'))
