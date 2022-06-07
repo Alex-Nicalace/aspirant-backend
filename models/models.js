@@ -718,6 +718,9 @@ tblFace_tblOrder.belongsTo(tblOrder, {foreignKey: {allowNull: false}}/*чтоб�
 tblFaceAspirant.hasMany(tblFace_tblOrder, {onDelete: 'NO ACTION'});
 tblFace_tblOrder.belongsTo(tblFaceAspirant, {onDelete: 'NO ACTION'});
 
+tblFaceAspirantAcadem.belongsToMany(tblOrder, {through: tblFace_tblOrder /*табл. связующая*/});
+tblOrder.belongsToMany(tblFaceAspirantAcadem, {through: tblFace_tblOrder});
+
 tblFaceAspirantAcadem.hasMany(tblFace_tblOrder);
 tblFace_tblOrder.belongsTo(tblFaceAspirantAcadem);
 
