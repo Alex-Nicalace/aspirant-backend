@@ -459,7 +459,7 @@ const tblFaceAspirant = sequelize.define('tblFaceAspirant', {
     isHeadDepartment: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
     tblDictSubjectId: {type: DataTypes.INTEGER},
     tblDictEducationFormId: {type: DataTypes.INTEGER},
-    tblDictDirectionalityAndSpecialtyId: {type: DataTypes.INTEGER},
+    tblDictSpecialtyId: {type: DataTypes.INTEGER},
     dissertationTheme: {
         type: DataTypes.STRING(500), allowNull: false, validate: {
             notNull: {args: true, msg: 'не допускается пустое значение'},  // не допусает значение NULL
@@ -474,7 +474,7 @@ const tblFaceAspirant = sequelize.define('tblFaceAspirant', {
         {unique: false, fields: ['tblFaceId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
         {unique: false, fields: ['tblDictSubjectId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
         {unique: false, fields: ['tblDictEducationFormId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
-        {unique: false, fields: ['tblDictDirectionalityAndSpecialtyId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {unique: false, fields: ['tblDictSpecialtyId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
         {unique: false, fields: ['tblAcademicAdvisorId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
     ]
 });
@@ -520,14 +520,13 @@ const tblFace_tblOrder = sequelize.define('tblFace_tblOrder', {
             key: 'id'
         }
     },
-    // tblFaceAspirantId: {
-    //     type: DataTypes.INTEGER,
-    //     //allowNull: false,
-    //     // references: {
-    //     //     model: tblFaceAspirant,
-    //     //     key: 'id'
-    //     // }
-    // },
+    tblFaceAspirantId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: tblFaceAspirant,
+            key: 'id'
+        }
+    },
     typeRel: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -577,7 +576,7 @@ const tblDictNameDirection = sequelize.define('tblDictNameDirection', {
     }
 })
 
-const tblDictDirectionalityAndSpecialty = sequelize.define('tblDictDirectionalityAndSpecialty', {
+const tblDictSpecialty = sequelize.define('tblDictSpecialty', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     tblDictNameDirectionId: {type: DataTypes.INTEGER},
     DirectionalityOrSpecialty: {
@@ -598,7 +597,11 @@ const tblDictDirectionalityAndSpecialty = sequelize.define('tblDictDirectionalit
     }
 }, {
     indexes: [
-        {unique: false, fields: ['tblDictNameDirectionId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
+        {
+            unique: false,
+            fields: ['tblDictNameDirectionId'],
+            name: 'tblDictSpecialties_tblDictNameDirectionId'
+        }, // индекс по внешнему ключу для оптимизатора запросов СУБД
         {unique: false, fields: ['tblDictEnterpriseId']}, // индекс по внешнему ключу для оптимизатора запросов СУБД
     ]
 })
@@ -703,8 +706,8 @@ const tblFaceExaminations = sequelize.define('tblFaceExaminations', {
 
 
 // описание связи многий-ко-многим (лица в приказах)
-tblFace.belongsToMany(tblOrder, {through: tblFace_tblOrder /*табл. связующая*/});
-tblOrder.belongsToMany(tblFace, {through: tblFace_tblOrder});
+// tblFace.belongsToMany(tblOrder, {through: tblFace_tblOrder /*табл. связующая*/});
+// tblOrder.belongsToMany(tblFace, {through: tblFace_tblOrder});
 
 tblFace.hasMany(tblFace_tblOrder, {foreignKey: {allowNull: false}});
 tblFace_tblOrder.belongsTo(tblFace, {foreignKey: {allowNull: false}}/*чтобы не допускать пустого ключа*/);
@@ -715,20 +718,8 @@ tblFace_tblOrder.belongsTo(tblOrder, {foreignKey: {allowNull: false}}/*чтоб�
 tblFaceAspirant.hasMany(tblFace_tblOrder, {onDelete: 'NO ACTION'});
 tblFace_tblOrder.belongsTo(tblFaceAspirant, {onDelete: 'NO ACTION'});
 
-tblFaceAspirantAcadem.belongsToMany(tblOrder, {through: tblFace_tblOrder /*табл. связующая*/});
-tblOrder.belongsToMany(tblFaceAspirantAcadem, {through: tblFace_tblOrder});
-
 tblFaceAspirantAcadem.hasMany(tblFace_tblOrder);
 tblFace_tblOrder.belongsTo(tblFaceAspirantAcadem);
-
-// tblFaceAspirant.belongsToMany(tblOrder, {through: tblFaceAspirant_tblOrder /*табл. связующая*/});
-// tblOrder.belongsToMany(tblFaceAspirant, {through: tblFaceAspirant_tblOrder});
-//
-// tblFaceAspirant.hasMany(tblFaceAspirant_tblOrder, {foreignKey: {allowNull: false}});
-// tblFaceAspirant_tblOrder.belongsTo(tblFaceAspirant, {foreignKey: {allowNull: false}}/*чтобы не допускать пустого ключа*/);
-//
-// tblOrder.hasMany(tblFaceAspirant_tblOrder, {foreignKey: {allowNull: false}});
-// tblFaceAspirant_tblOrder.belongsTo(tblOrder, {foreignKey: {allowNull: false}}/*чтобы не допускать пустого ключа*/);
 
 // описание древовидной модели
 tblDictEnterprise.hasMany(tblDictEnterprise, {
@@ -749,11 +740,11 @@ tblFaceName.belongsTo(tblFace, {
 tblAcademicAdvisor.hasMany(tblFaceAspirant, {foreignKey: {allowNull: false}, onDelete: 'NO ACTION'});
 tblFaceAspirant.belongsTo(tblAcademicAdvisor, {foreignKey: {allowNull: false}, onDelete: 'NO ACTION'});
 
-tblDictNameDirection.hasMany(tblDictDirectionalityAndSpecialty);
-tblDictDirectionalityAndSpecialty.belongsTo(tblDictNameDirection);
+tblDictNameDirection.hasMany(tblDictSpecialty);
+tblDictSpecialty.belongsTo(tblDictNameDirection);
 
-tblDictEnterprise.hasMany(tblDictDirectionalityAndSpecialty, {foreignKey: {allowNull: false}});
-tblDictDirectionalityAndSpecialty.belongsTo(tblDictEnterprise, {foreignKey: {allowNull: false}});
+tblDictEnterprise.hasMany(tblDictSpecialty, {foreignKey: {allowNull: false}});
+tblDictSpecialty.belongsTo(tblDictEnterprise, {foreignKey: {allowNull: false}});
 
 tblFace.hasMany(tblFaceCitizenship, {foreignKey: {allowNull: false}});
 tblFaceCitizenship.belongsTo(tblFace, {foreignKey: {allowNull: false}});
@@ -815,8 +806,8 @@ tblFaceAspirant.belongsTo(tblDictSubject, {foreignKey: {allowNull: false}, onDel
 tblDictEducationForm.hasMany(tblFaceAspirant, {foreignKey: {allowNull: false}, onDelete: 'NO ACTION'});
 tblFaceAspirant.belongsTo(tblDictEducationForm, {foreignKey: {allowNull: false}, onDelete: 'NO ACTION'});
 
-tblDictDirectionalityAndSpecialty.hasMany(tblFaceAspirant, {foreignKey: {allowNull: false}, onDelete: 'NO ACTION'});
-tblFaceAspirant.belongsTo(tblDictDirectionalityAndSpecialty, {foreignKey: {allowNull: false}, onDelete: 'NO ACTION'});
+tblDictSpecialty.hasMany(tblFaceAspirant, {foreignKey: {allowNull: false}, onDelete: 'NO ACTION'});
+tblFaceAspirant.belongsTo(tblDictSpecialty, {foreignKey: {allowNull: false}, onDelete: 'NO ACTION'});
 
 // tblDictSpecialty.hasMany(tblFaceAspirant, {foreignKey: {allowNull: false}});
 // tblFaceAspirant.belongsTo(tblDictSpecialty, {foreignKey: {allowNull: false}});
@@ -881,8 +872,7 @@ module.exports = {
     tblDictSubject,
     tblFaceAspirant,
     tblDictEducationForm,
-    //tblDictSpecialty,
-    tblDictDirectionalityAndSpecialty,
+    tblDictSpecialty,
     tblDictNameDirection,
     tblAcademicAdvisor,
     tblFaceScientificPublications,

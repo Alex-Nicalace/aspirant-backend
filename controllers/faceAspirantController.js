@@ -2,7 +2,7 @@ const {
     tblFaceAspirant,
     tblDictEducationForm,
     tblDictSubject,
-    tblDictDirectionalityAndSpecialty,
+    tblDictSpecialty,
     tblDictNameDirection,
     tblAcademicAdvisor,
     tblDictEnterprise,
@@ -66,7 +66,7 @@ class faceAspirantController {
                     //attributes: [],
                 },
                 {
-                    model: tblDictDirectionalityAndSpecialty,
+                    model: tblDictSpecialty,
                     attributes: ['DirectionalityOrSpecialty'],
                     required: true,
                     include: [
@@ -246,7 +246,7 @@ class faceAspirantController {
             tblDictEducationFormId,
             tblDictNameDirectionId,
             status,
-            tblDictDirectionalityAndSpecialtyId,
+            tblDictSpecialtyId,
             facultyId,
             departmentId,
             tblDictSubjectId,
@@ -338,8 +338,8 @@ class faceAspirantController {
             if (tblDictEducationFormId)
                 paramsFaceAspirant[Op.and].push({tblDictEducationFormId});
 
-            if (tblDictDirectionalityAndSpecialtyId)
-                paramsFaceAspirant[Op.and].push({tblDictDirectionalityAndSpecialtyId});
+            if (tblDictSpecialtyId)
+                paramsFaceAspirant[Op.and].push({tblDictSpecialtyId});
 
             if (tblDictSubjectId)
                 paramsFaceAspirant[Op.and].push({tblDictSubjectId});

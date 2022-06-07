@@ -1,4 +1,4 @@
-const {tblDictDirectionalityAndSpecialty, tblDictNameDirection, tblDictEnterprise} = require('../models/models');
+const {tblDictSpecialty, tblDictNameDirection, tblDictEnterprise} = require('../models/models');
 const Crud = require('./Crud');
 const ApiError = require('../error/ApiError');
 const {Sequelize} = require("sequelize");
@@ -10,7 +10,7 @@ const {Op} = require("sequelize");
 class Controller {
     getOnParams = async (params) => {
         //const fn = dictEnterpriseController.getFullName;
-        return await tblDictDirectionalityAndSpecialty.findAll({
+        return await tblDictSpecialty.findAll({
             attributes: {
                 include: [
                     [Sequelize.col('tblDictNameDirection.nameDirection'), 'nameDirection'],
@@ -36,7 +36,7 @@ class Controller {
 
     create = async (req, res, next) => {
         try {
-            const recCreated = await Crud.create(req, null, next, tblDictDirectionalityAndSpecialty);
+            const recCreated = await Crud.create(req, null, next, tblDictSpecialty);
             const dataset = await this.getOnParams({id: recCreated.id});
             return res.json(dataset[0]);
         } catch (e) {
@@ -45,7 +45,7 @@ class Controller {
     }
 
     update = async (req, res, next) => {
-        const updateRec = await Crud.update(req, null, next, tblDictDirectionalityAndSpecialty);
+        const updateRec = await Crud.update(req, null, next, tblDictSpecialty);
         try {
             const dataset = await this.getOnParams({id: updateRec.id});
             return res.json(dataset[0]);
@@ -80,7 +80,7 @@ class Controller {
     }
 
     getAllDirectionality = async (req, res, next) => {
-        //await Crud.getAll(req, res, next, tblDictDirectionalityAndSpecialty, [['DirectionalityOrSpecialty', 'ASC']]);
+        //await Crud.getAll(req, res, next, tblDictSpecialty, [['DirectionalityOrSpecialty', 'ASC']]);
         try {
             const params = {
                 tblDictNameDirectionId: {
@@ -97,7 +97,7 @@ class Controller {
     }
 
     getAllSpecialty = async (req, res, next) => {
-        //await Crud.getAll(req, res, next, tblDictDirectionalityAndSpecialty, [['DirectionalityOrSpecialty', 'ASC']]);
+        //await Crud.getAll(req, res, next, tblDictSpecialty, [['DirectionalityOrSpecialty', 'ASC']]);
         try {
             const params = {
                 tblDictNameDirectionId: {
@@ -114,7 +114,7 @@ class Controller {
     }
 
     async delete(req, res, next) {
-        await Crud.delete(req, res, next, tblDictDirectionalityAndSpecialty);
+        await Crud.delete(req, res, next, tblDictSpecialty);
     }
 }
 
