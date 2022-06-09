@@ -41,7 +41,7 @@ class FaceController {
                     model: tblFacePhoto,
                     order: [['dateOn', 'DESC']],
                     limit: 1,
-                    attributes: ['pathFile']
+                    attributes: ['photoFile']
                 }
             ]
         })

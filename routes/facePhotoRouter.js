@@ -9,6 +9,7 @@ const checkRole = require("../middleware/checkRoleMiddleware");
 router.post('/', checkRole('canInsert'), facePhotoController.create);
 router.get('/', facePhotoController.getAll);
 router.get('/faceId/:faceId', facePhotoController.getAllOneFace);
+router.get('/photoId/:id', facePhotoController.getFile);
 router.get('/:id', facePhotoController.getOne);
 router.delete('/:id', checkRole('canDelete'), facePhotoController.delete);
 router.put('/', checkRole('canUpdate'), facePhotoController.update);

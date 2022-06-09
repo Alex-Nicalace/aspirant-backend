@@ -161,9 +161,16 @@ const tblFacePhoto = sequelize.define('tblFacePhoto', {
         allowNull: false,
         validate: {notNull: {args: true, msg: 'поле "дата" не может быть пустым'}}
     },
-    pathFile: {
-        type: DataTypes.STRING, allowNull: false, unique: true//, validate: {unique: true}
+    photoFile: {
+        type: DataTypes.BLOB,
+        allowNull: false,
+        validate: {notNull: {args: true, msg: 'поле "фото" не может быть пустым'}}
     },
+    typeFile: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {notNull: {args: true, msg: 'не опрежелен тип файла'}}
+    }
 }, {
     indexes: [
         {unique: false, fields: ['tblFaceId']} // индекс по внешнему ключу для оптимизатора запросов СУБД

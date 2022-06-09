@@ -119,15 +119,6 @@ const FacesList = ({
         setIsOpenPopover(false);
     }
 
-    // if (viewCardMode === 'popover') {
-    //     headCells[1].onClick = openPopoverHandler;
-    //     headCells[1].style = {color: 'blue', textDecoration: 'underline'};
-    // }
-    // if (viewCardMode === 'link') {
-    //     headCells[1].linkArgument = 'id';
-    //     headCells[1].link = `${FACES_LIST_ROUTE}`;
-    // }
-
     const toggleShowPhotoHandle = () => {
         setShowPhoto(prev => !prev)
     }

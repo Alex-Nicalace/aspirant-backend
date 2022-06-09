@@ -161,7 +161,7 @@ function formatingOnType(value, dataType) {
         case 'boolean':
             return <Checkbox size='small' color='default' checked={value}/> //value && 'да'
         case 'image':
-            return value && <img src={`/${value}`} alt="фото" style={{width: '100px'}}/>
+            return value && <img src={value} alt="фото" style={{width: '100px'}}/>
         default:
             return value;
     }

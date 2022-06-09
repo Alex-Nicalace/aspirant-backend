@@ -4,7 +4,7 @@ export const getFacesSelector = (state) => {
     return state.faces;
 }
 
-export const  getDatasetFacesSelector = createSelector([getFacesSelector], (state) => {
+export const getDatasetFacesSelector = createSelector([getFacesSelector], (state) => {
     return state.dataset;
 });
 
@@ -22,6 +22,9 @@ export const getDatasetToFlatFacesSelector = createSelector([getDatasetFacesSele
     };
     return dataset.map(i => {
         const infoAboutAspirant = getInfoAboutAspirant(i.tblFaceAspirants, now);
+        const base64 = i.tblFacePhotos[0]?.photoFile
+            ? URL.createObjectURL(new Blob([new Uint8Array(i.tblFacePhotos[0]?.photoFile.data)], {type: 'image/jpeg'}))
+            : null;
         return {
             id: i.id,
             birthdate: i.birthdate,
@@ -35,7 +38,7 @@ export const getDatasetToFlatFacesSelector = createSelector([getDatasetFacesSele
             isAspirant: infoAboutAspirant.isAspirant,
             isWasAspirant: infoAboutAspirant.isWasAspirant,
             isAcademicAdvisor: i.tblAcademicAdvisors.length > 0,
-            photo: i.tblFacePhotos[0]?.pathFile,
+            photo: base64,
         }
     })
 });

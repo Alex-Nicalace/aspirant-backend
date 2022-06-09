@@ -57,13 +57,11 @@ class faceAspirantController {
                     model: tblDictEducationForm,
                     attributes: ['educationForm'],
                     required: true,
-                    //attributes: [], // указано какие поля необходимы. Если массив пустой то никакие поля не выводятся
                 },
                 {
                     model: tblDictSubject,
                     attributes: ['subject'],
                     required: true,
-                    //attributes: [],
                 },
                 {
                     model: tblDictSpecialty,

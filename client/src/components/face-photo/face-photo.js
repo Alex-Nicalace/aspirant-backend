@@ -13,7 +13,7 @@ import Grid from "@material-ui/core/Grid";
 import {useStylesPopupContent} from "../../hooks/use-styles-popup-content";
 import Typography from "@material-ui/core/Typography";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(({
     root: {
         width: '275px',
         textAlign: 'center',
@@ -60,7 +60,13 @@ const FacePhoto = ({faceId}) => {
     }, [])
 
     useEffect(() => {
-        setPathPhoto(dataset[idxPhoto]?.pathFile);
+        if (dataset[idxPhoto]) {
+            const blobData = new Blob([new Uint8Array(dataset[idxPhoto].photoFile.data)]);
+            setPathPhoto(URL.createObjectURL(blobData));
+        }
+        return () => {
+            URL.revokeObjectURL(pathPhoto);
+        }
     }, [idxPhoto, dataset])
 
     const open = Boolean(anchorEl);
@@ -132,7 +138,7 @@ const FacePhoto = ({faceId}) => {
             </Grid>
             <div className='img-container'>
                 {countPhoto
-                    ? <img src={'/' + pathPhoto} alt='фото'/>
+                    ? <img src={pathPhoto} alt='фото'/>
                     : <Typography style={{marginTop: '50%'}} color='textSecondary' > фото отсутствует </Typography>
                 }
             </div>
