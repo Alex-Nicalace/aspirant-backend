@@ -1,14 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {useAspirantApiContext} from "../context/aspirant-api-context/aspirant-api-context";
 import * as yup from "yup";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import FormWrapField from "../form-wrap-field";
 import {Input, InputDate} from "../controls/react-hook-form";
-import {TextField} from "@material-ui/core";
-import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
-import {makeStyles} from "@material-ui/core/styles";
 
 const schema = yup.object().shape({
     numOrder: yup
@@ -26,21 +22,14 @@ const schema = yup.object().shape({
         .mixed()
         //.required('обязательное поле')
         .nullable(),
-        //.test('fileType', 'Только файлы: .pdf', value => SUPPORTED_FORMATS.includes(value.type)),
+    //.test('fileType', 'Только файлы: .pdf', value => SUPPORTED_FORMATS.includes(value.type)),
     isDeleteFile: yup
         .boolean()
         .nullable(),
 });
 
-const useStyles = makeStyles(() => ({
-    btnSelect: {
-        alignSelf: 'flex-end',
-        textAlign: 'right'
-    },
-}));
-
 const OrdersEdit = ({closeEdit, modeEdit, currentRec}) => {
-    const {control, handleSubmit, formState: {errors}, setValue, watch} = useForm({
+    const {control, handleSubmit, formState: {errors}, setValue} = useForm({
         mode: "onBlur",
         defaultValues: {isDeleteFile: false},
         resolver: yupResolver(schema),
@@ -52,19 +41,6 @@ const OrdersEdit = ({closeEdit, modeEdit, currentRec}) => {
             dataset,
         }
     } = useAspirantApiContext();
-    const [isExistsFile, setIsExistsFile] = useState(false);
-    const classes = useStyles();
-    const pathFile = watch('pathFile');
-    const isDeleteFile = watch('isDeleteFile');
-
-    useEffect(() => {
-        if (modeEdit === 'update')
-            setIsExistsFile(Boolean(dataset.find(({id}) => +id === +currentRec).pathFile))
-    }, [dataset, currentRec, modeEdit])
-
-    const onDeleteFileHandle = () => {
-        setValue('isDeleteFile', true);
-    }
 
     return (
         <FormWrapField
@@ -115,38 +91,18 @@ const OrdersEdit = ({closeEdit, modeEdit, currentRec}) => {
                 minRows={4}
                 maxRows={30}
             />
-            {!isExistsFile || isDeleteFile
-                ? <Input
-                    control={control}
-                    name='file'
-                    rules={{required: true}}
-                    defaultValue=''
-                    label="выберите файл"
-                    required
-                    type='file'
-                    error={!!errors.file}
-                    helperText={errors?.file?.message}
-                    fullWidth
-                />
-                : <Grid container alignContent='flex-end'>
-                    <Grid item lg={9}>
-                        <TextField
-                            value={pathFile}
-                            label='прикрепленный файл'
-                            fullWidth
-                        />
-                    </Grid>
-                    <Grid item lg={3} className={classes.btnSelect}>
-                        <Button
-                            variant='outlined'
-                            size='small'
-                            onClick={onDeleteFileHandle}
-                        >Удалить файл
-                        </Button>
-                    </Grid>
-                </Grid>
-
-            }
+            <Input
+                control={control}
+                name='file'
+                rules={{required: true}}
+                defaultValue=''
+                label="выберите файл"
+                required
+                type='file'
+                error={!!errors.file}
+                helperText={errors?.file?.message}
+                fullWidth
+            />
         </FormWrapField>
     );
 };

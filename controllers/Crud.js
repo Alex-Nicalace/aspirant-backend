@@ -11,7 +11,7 @@ class Crud {
     }
 
     async update(req, res, next, model) {
-        const {id/*, educationLevel, weightEducationLevel*/} = req.body; // деструктуризация тела запроса
+        const {id} = req.body; // деструктуризация тела запроса
         const rec = await model.findByPk(id); // нахожу запись по первичному ключу
         if (!rec)
             next(ApiError.badRequest('record not found'));

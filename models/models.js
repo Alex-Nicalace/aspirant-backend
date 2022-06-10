@@ -375,7 +375,12 @@ const tblOrder = sequelize.define('tblOrder', {
         }
     },
     text: {type: DataTypes.TEXT},
-    pathFile: {type: DataTypes.STRING}
+    orderFile: {
+        type: DataTypes.BLOB,
+    },
+    typeFile: {
+        type: DataTypes.STRING,
+    }
 
 })
 

@@ -23,7 +23,7 @@ export const getDatasetToFlatFacesSelector = createSelector([getDatasetFacesSele
     return dataset.map(i => {
         const infoAboutAspirant = getInfoAboutAspirant(i.tblFaceAspirants, now);
         const base64 = i.tblFacePhotos[0]?.photoFile
-            ? URL.createObjectURL(new Blob([new Uint8Array(i.tblFacePhotos[0]?.photoFile.data)], {type: 'image/jpeg'}))
+            ? URL.createObjectURL(new Blob([new Uint8Array(i.tblFacePhotos[0]?.photoFile.data)], {type: i.tblFacePhotos[0].typeFile}))
             : null;
         return {
             id: i.id,

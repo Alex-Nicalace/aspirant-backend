@@ -10,11 +10,14 @@ const headCells = [
     {id: 'dateOrder', disablePadding: false, label: 'дата', dataType: 'date'},
     {id: 'text', disablePadding: false, label: 'содержание'},
     {
-        id: 'pathFile', disablePadding: false, label: 'файл', componentParams: [{nameParam:"pathFile"}],
+        id: 'orderFile', disablePadding: false, label: 'файл', componentParams: [{nameParam:"orderFile"}, {nameParam: "typeFile"}],
         Component: (params) => {
-            const {pathFile} = params
-            return pathFile && <button onClick={ () => {
-                window.open(pathFile);
+            const {orderFile, typeFile} = params
+            const base64 = orderFile
+                ? URL.createObjectURL(new Blob([new Uint8Array(orderFile.data)], {type: typeFile}))
+                : null;
+            return orderFile && <button onClick={ () => {
+                window.open(base64);
             } }>Открыть</button>
         }
     }
