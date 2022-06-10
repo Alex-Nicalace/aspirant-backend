@@ -31,7 +31,6 @@ const schema = yup.object().shape({
 const OrdersEdit = ({closeEdit, modeEdit, currentRec}) => {
     const {control, handleSubmit, formState: {errors}, setValue} = useForm({
         mode: "onBlur",
-        defaultValues: {isDeleteFile: false},
         resolver: yupResolver(schema),
     });
     const {

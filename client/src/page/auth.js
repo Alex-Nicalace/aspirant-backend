@@ -42,9 +42,10 @@ const Auth = () => {
         resolver: yupResolver(schema),
     });
 
-    const {user: {login}} = useAspirantApiContext();
+    const {user: {login, error}} = useAspirantApiContext();
 
-    const onLogin = async (data) => {
+    const onLogin = async (data, e) => {
+        e.preventDefault();
         await login(data);
     }
 
@@ -83,6 +84,14 @@ const Auth = () => {
                     fullWidth
                     variant='outlined'
                 />
+                <Typography
+                    align='center'
+                    variant='caption'
+                    color='error'
+                    display={'block'}
+                >
+                    {error?.message}
+                </Typography>
                 <div>
                     <Button
                         variant='contained'
