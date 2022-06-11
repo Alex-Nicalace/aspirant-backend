@@ -36,7 +36,7 @@ const AppRouter = () => {
                         <Switch>
                             {publicRoutes.map(({path, render, exact}) =>
                                 <Route key={path} path={path} render={render} exact={exact}/>)}
-                            <Redirect to={publicRoutes[0].path}/>
+                            {!isLoading && <Redirect to={publicRoutes[0].path}/>}
                         </Switch>
                     )
                 }

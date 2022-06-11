@@ -11,7 +11,7 @@ import Paper from '@material-ui/core/Paper';
 import Checkbox from "@material-ui/core/Checkbox";
 import IconButton from "@material-ui/core/IconButton";
 import Link from "@material-ui/core/Link";
-import {useTheme} from "@material-ui/core";
+import {Backdrop, useTheme} from "@material-ui/core";
 import LastPageIcon from '@material-ui/icons/LastPage';
 import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
@@ -26,12 +26,55 @@ import DotsVertIcon from '@material-ui/icons/MoreVert'
 import Grid from "@material-ui/core/Grid";
 import MenuPopupColumns from "./menu-popup-columns";
 
-const useStyles1 = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
     root: {
+        width: '100%',
+    },
+    container: {
+        maxHeight: ({maxHeight}) => maxHeight,
+        // minHeight: '300px'
+        position: 'relative'
+    },
+    paper: {
+        width: '100%',
+        marginBottom: theme.spacing(2),
+    },
+    table: {
+        minWidth: 500,
+        '& th': {
+            fontWeight: 'bold',
+        }
+
+    },
+    visuallyHidden: {
+        border: 0,
+        clip: 'rect(0 0 0 0)',
+        height: 1,
+        margin: -1,
+        overflow: 'hidden',
+        padding: 0,
+        position: 'absolute',
+        top: 20,
+        width: 1,
+    },
+    dotIcon: {
+        // //visibility: 'hidden',
+        // opacity: 0,
+        // '&:hover': {
+        //     //visibility: 'visible',
+        //     opacity: 1,
+        // }
+    },
+    backdrop: {
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff',
+        position: 'absolute'
+    },
+
+    pagination: {
         flexShrink: 0,
         marginLeft: theme.spacing(2.5),
     },
-
 }));
 
 function descendingComparator(a, b, orderBy) {
@@ -61,7 +104,7 @@ function stableSort(array, comparator) {
 }
 
 function TablePaginationActions({count, page, rowsPerPage, onPageChange}) {
-    const classes = useStyles1();
+    const classes = useStyles();
     const theme = useTheme();
 
     const handleFirstPageButtonClick = (event) => {
@@ -81,7 +124,7 @@ function TablePaginationActions({count, page, rowsPerPage, onPageChange}) {
     };
 
     return (
-        <div className={classes.root}>
+        <div className={classes.pagination}>
             <IconButton
                 onClick={handleFirstPageButtonClick}
                 disabled={page === 0}
@@ -216,46 +259,7 @@ export default function TableEnhanced({
                                           masterFieldName,
                                           tableName
                                       }) {
-    const useStyles = makeStyles((theme) => ({
-        root: {
-            width: '100%',
-        },
-        container: {
-            maxHeight: maxHeight,
-            // minHeight: '300px'
-        },
-        paper: {
-            width: '100%',
-            marginBottom: theme.spacing(2),
-        },
-        table: {
-            minWidth: 500,
-            '& th': {
-                fontWeight: 'bold',
-            }
-
-        },
-        visuallyHidden: {
-            border: 0,
-            clip: 'rect(0 0 0 0)',
-            height: 1,
-            margin: -1,
-            overflow: 'hidden',
-            padding: 0,
-            position: 'absolute',
-            top: 20,
-            width: 1,
-        },
-        dotIcon: {
-            // //visibility: 'hidden',
-            // opacity: 0,
-            // '&:hover': {
-            //     //visibility: 'visible',
-            //     opacity: 1,
-            // }
-        }
-    }));
-    const classes = useStyles();
+    const classes = useStyles({maxHeight});
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState(initialOrderBy);
     const [page, setPage] = React.useState(0);
@@ -355,7 +359,7 @@ export default function TableEnhanced({
 
     masterFieldName = masterFieldName || keyField;
 
-    if (!dataset.length)
+    if (!isLoading && !dataset.length)
         return (
             <IndicatorNoData/>
         )
@@ -365,9 +369,17 @@ export default function TableEnhanced({
         <Paper className={classes.root}>
             <TableContainer
                 className={classes.container}
-                aria-describedby={CircularProgress}
+                aria-describedby={`tbl-progress-${tableName}`}
                 aria-busy={isLoading}
             >
+                <Backdrop
+                    className={classes.backdrop}
+                    open={isLoading}
+                >
+                    <CircularProgress
+                        id={`tbl-progress-${tableName}`}
+                        color="inherit" />
+                </Backdrop>
                 <Table
                     stickyHeader
                     className={classes.table}
@@ -469,7 +481,6 @@ export default function TableEnhanced({
             />
 
         </Paper>
-        // </div>
     );
 }
 

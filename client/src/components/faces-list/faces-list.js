@@ -145,7 +145,7 @@ const FacesList = ({
                 tableName='faces-list'
             />
         )
-    }, [faces, headCells])
+    }, [faces, headCells, isLoading])
 
     return (
         <FrameWithTitle head='Лица, имеющиеся в базе данных'>

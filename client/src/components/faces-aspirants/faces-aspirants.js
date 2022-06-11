@@ -16,7 +16,6 @@ import ButtonFilter from "../UI/button-filter";
 import Box from "@material-ui/core/Box";
 import {TextField} from "@material-ui/core";
 import useInput from "../../hooks/use-input";
-import UseDebounce from "../../hooks/use-debounce";
 import {searchByName} from "../../utils/my-func";
 
 const headCells = [
@@ -120,7 +119,7 @@ const FacesAspirants = ({
                 tableName='aspirants'
             />
         )
-    }, [aspirants])
+    }, [aspirants, isLoading])
 
     const filter = useMemo(() => {
         return (

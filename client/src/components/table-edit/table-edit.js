@@ -20,9 +20,9 @@ const TableEdit = ({
                        valuesToState, // какието переменные которые нужно вставить при добавлении новых записей
                        currentRecInitial,
                        maxHeight,
-                       tableName
+                       tableName,
+                       isLoading
                    }) => {
-
     const [modeEdit, setModeEdit] = useState(null)
     const [currentRec, setCurrentRec] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -45,10 +45,6 @@ const TableEdit = ({
         }
 
     }, [dataset])
-
-    // useEffect(() => {
-    //     onGetKeyValue(currentRec)
-    // }, [currentRec])
 
     const setModeEditHandle = (modeEdit, event) => {
         if (modeEdit === 'update' && !currentRec)
@@ -106,6 +102,7 @@ const TableEdit = ({
                 selectedKey={currentRec}
                 maxHeight={maxHeight}
                 tableName={tableName}
+                isLoading={isLoading}
             />
             <DialogAlert
                 message='Вы действительно хотите удалить запись?'
