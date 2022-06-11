@@ -80,7 +80,7 @@ export const insertFaceAcademicAdvisor = (rec) => async (facesAcademicAdvisorAPI
 export const deleteFaceAcademicAdvisor = (id) => async (facesAcademicAdvisorAPI, dispatch) => {
     dispatch(facesAcademicAdvisorRequested());
     try {
-        const deleted = await facesAcademicAdvisorAPI.delete(id);
+        // const deleted = await facesAcademicAdvisorAPI.delete(id);
         dispatch(facesAcademicAdvisorDeleted(id));
         dispatch(setDisappearingMessage('запись удалена', WARNING));
         // фамилия добавлена теперь надо обновить запись из свобной таблицы

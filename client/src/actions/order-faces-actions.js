@@ -81,7 +81,7 @@ export const insertOrderFaces = (rec) => async (faceOrdersAPI, dispatch) => {
 export const deleteOrderFaces = (id) => async (faceOrdersAPI, dispatch) => {
     dispatch(orderFacesRequested());
     try {
-        const deleted = await faceOrdersAPI.delete(id);
+        // const deleted = await faceOrdersAPI.delete(id);
         dispatch(orderFacesDeleted(id));
         dispatch(setDisappearingMessage('запись удалена', WARNING));
         // фамилия добавлена теперь надо обновить запись из свобной таблицы

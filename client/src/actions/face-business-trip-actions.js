@@ -81,7 +81,7 @@ export const insertFaceBusinessTrip = (rec) => async ({faceBusinessTripAPI, face
 export const deleteFaceBusinessTrip = (id) => async ({faceBusinessTripAPI, facesAPI}, dispatch) => {
     dispatch(faceBusinessTripRequested());
     try {
-        const deleted = await faceBusinessTripAPI.delete(id);
+        // const deleted = await faceBusinessTripAPI.delete(id);
         dispatch(faceBusinessTripDeleted(id));
         dispatch(setDisappearingMessage('запись удалена', WARNING));
         // фамилия добавлена теперь надо обновить запись из свобной таблицы

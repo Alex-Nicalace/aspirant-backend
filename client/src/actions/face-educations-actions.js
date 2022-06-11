@@ -81,7 +81,7 @@ export const insertFaceEducations = (rec) => async ({faceEducationsAPI, facesAPI
 export const deleteFaceEducations = (id) => async ({faceEducationsAPI, facesAPI}, dispatch) => {
     dispatch(faceEducationsRequested());
     try {
-        const deleted = await faceEducationsAPI.delete(id);
+        // const deleted = await faceEducationsAPI.delete(id);
         dispatch(faceEducationsDeleted(id));
         dispatch(setDisappearingMessage('запись удалена', WARNING));
         // фамилия добавлена теперь надо обновить запись из свобной таблицы

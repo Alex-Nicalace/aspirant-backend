@@ -75,7 +75,7 @@ export const insertFaceCitizenships = (rec) => async ({faceCitizenshipsAPI, face
 export const deleteFaceCitizenships = (id) => async ({faceCitizenshipsAPI, facesAPI}, dispatch) => {
     dispatch(faceCitizenshipsRequested());
     try {
-        const deleted = await faceCitizenshipsAPI.delete(id);
+        // const deleted = await faceCitizenshipsAPI.delete(id);
         dispatch(faceCitizenshipsDeleted(id));
         dispatch(setDisappearingMessage('запись удалена', WARNING));
         // фамилия добавлена теперь надо обновить запись из свобной таблицы

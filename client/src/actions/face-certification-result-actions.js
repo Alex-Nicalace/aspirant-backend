@@ -81,7 +81,7 @@ export const insertFaceCertificationResult = (rec) => async ({faceCertificationR
 export const deleteFaceCertificationResult = (id) => async ({faceCertificationResultAPI, facesAPI}, dispatch) => {
     dispatch(faceCertificationResultRequested());
     try {
-        const deleted = await faceCertificationResultAPI.delete(id);
+        // const deleted = await faceCertificationResultAPI.delete(id);
         dispatch(faceCertificationResultDeleted(id));
         dispatch(setDisappearingMessage('запись удалена', WARNING));
         // фамилия добавлена теперь надо обновить запись из свобной таблицы

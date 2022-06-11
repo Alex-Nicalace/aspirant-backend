@@ -81,7 +81,7 @@ export const insertFaceScientificPubl = (rec) => async ({faceScientificPublAPI, 
 export const deleteFaceScientificPubl = (id) => async ({faceScientificPublAPI, facesAPI}, dispatch) => {
     dispatch(faceScientificPublRequested());
     try {
-        const deleted = await faceScientificPublAPI.delete(id);
+        // const deleted = await faceScientificPublAPI.delete(id);
         dispatch(faceScientificPublDeleted(id));
         dispatch(setDisappearingMessage('запись удалена', WARNING));
         // фамилия добавлена теперь надо обновить запись из свобной таблицы
