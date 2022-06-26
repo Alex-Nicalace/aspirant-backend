@@ -175,11 +175,11 @@ class FaceController {
         if (sex)
             paramsForFace[Op.and].push({sex: stringToBoolean(sex)})
         if (yyyy)
-            paramsForFace[Op.and].push(Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('birthdate')), yyyy));
+            paramsForFace[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(YEAR FROM "birthdate")'), yyyy));
         if (mm)
-            paramsForFace[Op.and].push(Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('birthdate')), mm));
+            paramsForFace[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(MONTH FROM "birthdate")'), mm));
         if (dd)
-            paramsForFace[Op.and].push(Sequelize.where(Sequelize.fn('DAY', Sequelize.col('birthdate')), dd));
+            paramsForFace[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(DAY FROM "birthdate")'), dd));
 
         const paramsForFaceName = {};
         if (lastname)

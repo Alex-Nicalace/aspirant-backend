@@ -266,11 +266,11 @@ class faceAspirantController {
         if (sex)
             paramsForFace[Op.and].push({sex: stringToBoolean(sex)})
         if (yyyy)
-            paramsForFace[Op.and].push(Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('birthdate')), yyyy));
+            paramsForFace[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(YEAR FROM "birthdate")'), yyyy));
         if (mm)
-            paramsForFace[Op.and].push(Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('birthdate')), mm));
+            paramsForFace[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(MONTH FROM "birthdate")'), mm));
         if (dd)
-            paramsForFace[Op.and].push(Sequelize.where(Sequelize.fn('DAY', Sequelize.col('birthdate')), dd));
+            paramsForFace[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(DAY FROM "birthdate")'), dd));
 
         const paramsForFaceName = {};
         if (lastname)
@@ -317,18 +317,18 @@ class faceAspirantController {
                 paramsFaceAspirant[Op.and].push({isRecommendation: stringToBoolean(isHeadDepartment)})
 
             if (yyyyIn)
-                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('dateOn')), yyyyIn));
+                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(YEAR FROM "dateOn")'), yyyyIn));
             if (mmIn)
-                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('dateOn')), mmIn));
+                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(MONTH FROM "dateOn")'), mmIn));
             if (ddIn)
-                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.fn('DAY', Sequelize.col('dateOn')), ddIn));
+                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(DAY FROM "dateOn")'), ddIn));
 
             if (yyyyOut)
-                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('dateOff')), yyyyOut));
+                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(YEAR FROM "dateOff")'), yyyyOut));
             if (mmOut)
-                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('dateOff')), mmOut));
+                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(MONTH FROM "dateOff")'), mmOut));
             if (ddOut)
-                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.fn('DAY', Sequelize.col('dateOff')), ddOut));
+                paramsFaceAspirant[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(DAY FROM "dateOff")'), ddOut));
 
             if (dissertationTheme)
                 paramsFaceAspirant[Op.and].push({dissertationTheme: {[Op.like]: `${dissertationTheme}%`}})

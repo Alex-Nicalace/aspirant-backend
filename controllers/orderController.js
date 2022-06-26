@@ -59,9 +59,9 @@ class Controller {
         const params = {}
         params[Op.and] = [];
         numOrder && params[Op.and].push({numOrder})
-        dd && params[Op.and].push(Sequelize.where(Sequelize.fn('DAY', Sequelize.col('dateOrder')), dd));
-        mm && params[Op.and].push(Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('dateOrder')), mm));
-        yyyy && params[Op.and].push(Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('dateOrder')), yyyy));
+        dd && params[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(DAY FROM "dateOrder")'), dd));
+        mm && params[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(MONTH FROM "dateOrder")'), mm));
+        yyyy && params[Op.and].push(Sequelize.where(Sequelize.literal('EXTRACT(YEAR FROM "dateOrder")'), yyyy));
         text && params[Op.and].push({text: {[Op.like]: `%${text}%`}})
 
         try {
